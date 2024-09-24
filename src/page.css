@@ -1,20 +1,30 @@
-.container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    background-color: #757474;
+.bg {
+    opacity: 100%;
+    background: rgba(222, 213, 229, 0.73);
+    width: 100%; /* Ensures responsiveness */
+    height: 100%; /* Maintains aspect ratio */
   }
   .stats-lander {
-    /* Rectangle 14 */
-    width: 100%;
-    max-width: 600px;
-    margin-bottom: 0px;
-
+    opacity: 80%;
     background: rgba(140, 104, 170, 0.73);
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     border-radius: 0px 0px 85px 85px;
+    width: 100%; /* Ensures responsiveness */
+    height: auto; /* Maintains aspect ratio */
+    padding-bottom: 20px;
+
+  }
+  .stats-oval {
+    /* Rectangle 15 */
+    opacity: 80%;
+    width: 80%; /* Ensures responsiveness */
+    height: auto; /* Maintains aspect ratio */
+    background: #724598;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 100px;
+    margin: 0 auto;    
+    padding-top: 10px;
+    padding-bottom: 10px;   
 
   }
   .car-info {
@@ -26,8 +36,16 @@
     padding: 20px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   }
+  .rounded-bottom-img {
+    border-bottom-left-radius: 20px; /* Adjust as needed */
+    border-bottom-right-radius: 20px;
+    width: 100%; /* Ensures responsiveness */
+    height: auto; /* Maintains aspect ratio */
+  }
   
   .car-img {
+    margin-bottom: -25px;
+    opacity: 100%;
     width: 100%;
     height: auto;
     display: block;
@@ -91,4 +109,94 @@
     margin: 0;
     font-size: 1.2em;
   }
+/* No changes needed here */
+.toggle-container {
+    display: flex; /* Use flexbox for layout */
+    justify-content: center; /* Center items horizontally */
+  }
   
+  .toggle-button {
+    width: 100%; /* Ensures responsiveness */
+    display: inline-block; /* Makes the label inline */
+    justify-content: center;
+    display: flex;
+  }
+  
+  .toggle-button input {
+    opacity: 0; /* Hide the default checkbox */
+    width: 0; /* Prevents size issues */
+    height: 0; /* Prevents size issues */
+  }
+  
+  .slider {
+    width: 550px; /* Ensures responsiveness */
+    height: 50px; /* Maintains aspect ratio */
+    cursor: pointer; /* Changes cursor on hover */
+    background-color: #ccc; /* Default background color */
+    transition: .4s; /* Smooth transition */
+    border-radius: 34px; /* Rounded corners */
+    display: flex; /* Use flexbox for the inner labels */
+    align-items: center; /* Center labels vertically */
+    justify-content: space-between;
+    position: relative; /* Ensure child elements can be positioned */
+    margin: 0 auto;
+  }
+  
+  /* Circle inside the toggle */
+  .slider:before {
+    width: 300px; /* Ensures responsiveness */
+    height: 50px; /* Maintains aspect ratio */
+    content: ""; /* Empty content */
+    position: absolute;
+    background-color: rgba(140, 104, 170, 0.73); /* Circle color */
+    transition: .4s; /* Smooth transition */
+    border-radius: 34px; /* Rounded corners */
+  }
+  
+  /* Move the circle to the right when checked */
+  input:checked + .slider:before {
+    transform: translateX(250px); /* Move circle */
+  }
+  
+  /* Style for the toggle labels */
+  .toggle-label {
+    font-size: 20px;
+    color: white;
+    transition: font-size 0.4s ease, color 0.4s ease; 
+    position: absolute;
+    width: 50%; /* Adjust width so the label takes up half the slider */
+    text-align: center; /* Center the label text */
+  }
+  
+  .toggle-label.off {
+    left: 10px; /* Position "Cosmetics" on the left */
+  }
+  
+  .toggle-label.on {
+    right: 10px; /* Position "Performance" on the right */
+  }
+  
+  /* Show the appropriate label based on the toggle state */
+  .toggle-button input:checked + .slider .toggle-label.on {
+    color: white; /* Show 'On' when checked */
+    font-size: 20px;
+  }
+  
+  .toggle-button input:checked + .slider .toggle-label.off {
+    color: black; /* Show 'On' when checked */
+    font-size: 17px;
+
+  }
+  
+   .toggle-button input:not(:checked) + .slider .toggle-label.off {
+    color: white;
+    font-size: 20px;
+
+  }
+  
+  .toggle-button input:not(:checked) + .slider .toggle-label.on {
+    color: black; 
+    font-size: 17px;
+
+  }
+   
