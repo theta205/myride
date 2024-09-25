@@ -43,18 +43,18 @@ const UserPage = () => {
             style={{
               width: "auto", 
               height: "auto",
-              borderBottomLeftRadius: "66px", 
-              borderBottomRightRadius: "66px"
+              borderBottomLeftRadius: "0px", 
+              borderBottomRightRadius: "0px"
             }} 
           />
           <div style={{ textAlign: 'center' }}>
-            <h1>1999 Mazda Miata</h1>
+            <h1 className = "car-label">1999 Mazda Miata</h1>
           </div>
           <div className="stats-oval text-center">
             <Row className="justify-content-center ">
-              <Col>140 hp</Col>
-              <Col>119 ft/lbs</Col>
-              <Col>RWD</Col>
+              <Col> <span className="stats-label" >140 hp</span></Col>
+              <Col> <span className="stats-label" >119 ft/lbs</span></Col>
+              <Col> <span className="stats-label" >RWD</span></Col>
             </Row>
           </div>
         </div>
