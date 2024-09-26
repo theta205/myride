@@ -4,7 +4,6 @@ import { SignedIn, SignedOut, SignInButton, SignOutButton, useUser } from '@cler
 const Home = (props) => {
   // Use the useUser hook to get the details about the logged in user
   const { user } = useUser()
-
   return (
     <div className="mainContainer">
       <div className={'titleContainer'}>

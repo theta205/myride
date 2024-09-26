@@ -11,56 +11,31 @@ import Row from 'react-bootstrap/Row';
 import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useEffect, useState } from 'react';
+import Home from './home.js'
 import { useNavigate } from 'react-router-dom';
 
-
-const UserPage = () => {
+const UserEdit = () => {
   const { username } = useParams(); // Get the username from the URL
   const { user, isLoaded, isSignedIn } = useUser();
-  let owner = false;
-  console.log(username);
   const navigate = useNavigate();
-
-  const [isButtonVisible, setButtonVisible] = useState(false); // State for button visibility
-
-
-  if (isSignedIn){
-    if (user.username==username) {
-      owner = true;
-    }
-  }
-
-  useEffect(() => {
-      // Show the button based on the owner's status after the component mounts
-      setButtonVisible(owner); // Update button visibility
-  }, [owner]); // Dependency array
-  const editClick = () => {
-    // Perform an action (e.g., set a message)
-    return navigate("/"+user.username+"/edit");
-};
-
-
-  if (!isLoaded) {
-      return <div>Loading...</div>;
-  }
-  if (isLoaded &&!isSignedIn) {
-      return <div>Please sign in to view your profile.</div>;
-  }
-
   
+    if (!isLoaded) {
+        return <div>Loading...</div>;
+    }
+
+    if (!isSignedIn) {
+      return navigate('/');
+    }
+    else console.log(user);
+
+    if (isSignedIn){
+      if (user.username!=username) {
+        return navigate("/"+user.username+"/edit");
+      }
+    }
+    
 
   return (
-    // <div>
-    //   <h1>User Page</h1>
-    //     <div class="header">
-  //   <img src="gear.png" alt="Gear Icon" />
-  //   <img src="menu.png" alt="Menu Icon" />
-  // </div> <p>Your email: {user.primaryEmailAddress.emailAddress}</p>
-    //   <p>Viewing page for username: {username}</p> {/* Display the username */}
-    //   {/* You can add more user-specific information here */}
-    // </div>
-    
 <Container className="d-flex justify-content-center vh-100">
   <Row>
     <Col>
@@ -104,8 +79,7 @@ const UserPage = () => {
             </span>
           </label>
         </div>
-        {isButtonVisible && <button id="conditional-button" onClick={editClick}>Edit Car Details</button>}      
-        </div>
+      </div>
     </Col>
   </Row>        
         {/* <div class="hashtags">
@@ -118,9 +92,8 @@ const UserPage = () => {
         <img src="anime_girl.png" class="car-img" alt=" on Branch" /> */}
 </Container>
   
-      
+
   );
-      
 };
 
-export default UserPage;
+export default UserEdit;

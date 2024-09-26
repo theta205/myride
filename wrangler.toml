@@ -1,0 +1,10 @@
+name = "login-test"
+type = "javascript"
+compatibility_date = "2024-09-25"
+
+account_id = "756c633bf2948763f2ee715b68f92266"
+workers_dev = true
+main = "./build/service-worker.js"
+[site]
+
+bucket = "./build"

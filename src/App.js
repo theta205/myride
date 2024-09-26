@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Home from './home';
 import UserPage from './UserPage'; // Import your UserPage component
+import UserEdit from './UserEdit.js'; // Import your UserPage component
+
 import './App.css';
 import { useUser } from '@clerk/clerk-react';
 
@@ -23,6 +25,10 @@ function App() {
           <Route 
             path="/:username" // Dynamic route for usernames
             element={<UserPage />} // Add the route for UserPage
+          />
+          <Route 
+            path="/:username/edit" // Dynamic route for usernames
+            element={<UserEdit />} // Add the route for UserPage
           />
           {/* You can also add other routes here */}
         </Routes>
