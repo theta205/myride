@@ -18,7 +18,7 @@ const UserEdit = () => {
   const { username } = useParams(); // Get the username from the URL
   const { user, isLoaded, isSignedIn } = useUser();
   const navigate = useNavigate();
-  
+  console.log(username)
     if (!isLoaded) {
         return <div>Loading...</div>;
     }
@@ -33,7 +33,6 @@ const UserEdit = () => {
         return navigate("/"+user.username+"/edit");
       }
     }
-    
 
   return (
 <Container className="d-flex justify-content-center vh-100">

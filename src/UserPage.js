@@ -15,7 +15,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 
-const UserPage = () => {
+const  UserPage = () => {
   const { username } = useParams(); // Get the username from the URL
   const { user, isLoaded, isSignedIn } = useUser();
   let owner = false;
@@ -23,7 +23,10 @@ const UserPage = () => {
   const navigate = useNavigate();
 
   const [isButtonVisible, setButtonVisible] = useState(false); // State for button visibility
-
+  console.log('Is Loaded:', isLoaded);
+  console.log('Is Signed In:', isSignedIn);
+  console.log('Username:', username);
+  console.log('User:', user);
 
   if (isSignedIn){
     if (user.username==username) {
@@ -31,41 +34,27 @@ const UserPage = () => {
     }
   }
 
+
   useEffect(() => {
       // Show the button based on the owner's status after the component mounts
       setButtonVisible(owner); // Update button visibility
   }, [owner]); // Dependency array
+
   const editClick = () => {
     // Perform an action (e.g., set a message)
     return navigate("/"+user.username+"/edit");
-};
+  };
 
 
   if (!isLoaded) {
       return <div>Loading...</div>;
   }
-  if (isLoaded &&!isSignedIn) {
-      return <div>Please sign in to view your profile.</div>;
-  }
-
-  
-
-  return (
-    // <div>
-    //   <h1>User Page</h1>
-    //     <div class="header">
-  //   <img src="gear.png" alt="Gear Icon" />
-  //   <img src="menu.png" alt="Menu Icon" />
-  // </div> <p>Your email: {user.primaryEmailAddress.emailAddress}</p>
-    //   <p>Viewing page for username: {username}</p> {/* Display the username */}
-    //   {/* You can add more user-specific information here */}
-    // </div>
-    
-<Container className="d-flex justify-content-center vh-100">
+  return ( 
+ <Container className="d-flex justify-content-center vh-100">
   <Row>
-    <Col>
-      <div className='bg '> 
-        <div className="stats-lander " style = {{width:'600px'}}>
+    <Col> 
+     <div className='bg '>
+        <div className="stats-lander " style = {{width:'auto'}}>
           <Image 
             src={miata}
             className="img-fluid"
@@ -77,24 +66,24 @@ const UserPage = () => {
             }} 
           />
           <div style={{ textAlign: 'center' }}>
-            <h1 className = "car-label">1999 Mazda Miata</h1>
+            <h1 className = "vis car-label">1999 Mazda Miata</h1>
           </div>
           <div className="stats-oval text-center">
-            <Row className="justify-content-center ">
+            <Row xs='auto' className="justify-content-center ">
               <Col> <span className="stats-label" >140 hp</span></Col>
               <Col> <span className="stats-label" >119 ft/lbs</span></Col>
               <Col> <span className="stats-label" >RWD</span></Col>
             </Row>
           </div>
             <Row xs='auto' className="centered-div justify-content-center "> 
-            {/* max 5 i gues */}
+           
               <Col> <span className="hashtag-label" >#Stance</span></Col>
               <Col> <span className="hashtag-label" >#JDM</span></Col>
               <Col> <span className="hashtag-label" >#LowBoys</span></Col>
               <Col> <span className="hashtag-label" >#NA</span></Col>
               <Col> <span className="hashtag-label" >#DropTop</span></Col>
             </Row>
-        </div>
+        </div> 
         <div className="toggle-container" style={{ paddingTop: '20px' }}>
           <label className="toggle-button">
             <input type="checkbox" />
@@ -105,19 +94,23 @@ const UserPage = () => {
           </label>
         </div>
         {isButtonVisible && <button id="conditional-button" onClick={editClick}>Edit Car Details</button>}      
-        </div>
+        </div> 
     </Col>
-  </Row>        
-        {/* <div class="hashtags">
-          <p>#Stance #JDM #LowBoys #NA #DropTop</p>
-        </div>
-        <div class="performance-part">
-          <img src="air_filter.png" alt="Air Filter Icon" />
-          <h3>HPS Performance Cold Air Intake</h3>
-        </div>
-        <img src="anime_girl.png" class="car-img" alt=" on Branch" /> */}
+  </Row>         
 </Container>
-  
+
+//         {/* <div class="hashtags">
+//           <p>#Stance #JDM #LowBoys #NA #DropTop</p>
+//         </div>
+//         <div class="performance-part">
+//           <img src="air_filter.png" alt="Air Filter Icon" />
+//           <h3>HPS Performance Cold Air Intake</h3>
+//         </div>
+//         <img src="anime_girl.png" class="car-img" alt=" on Branch" /> */}
+// {/* 
+
+// </Container>
+//    */}
       
   );
       

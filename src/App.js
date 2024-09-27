@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, useParams, Navigate } from 'react-router-dom';
 import Home from './home';
 import UserPage from './UserPage'; // Import your UserPage component
 import UserEdit from './UserEdit.js'; // Import your UserPage component
-
+import NotFound from './NotFound'; // Create a 404 Not Found component
 import './App.css';
 import { useUser } from '@clerk/clerk-react';
+import { useClerk } from '@clerk/clerk-react'
+import UserRoute  from './UserRoute';
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -22,10 +24,8 @@ function App() {
             path="/" 
             element={<Home email={email} loggedIn={loggedIn} setLoggedIn={setLoggedIn} />} 
           />
-          <Route 
-            path="/:username" // Dynamic route for usernames
-            element={<UserPage />} // Add the route for UserPage
-          />
+          <Route path="/:username" element={<UserRoute />} /> {/* Dynamic route */}
+          <Route path="/404" element={<NotFound />} />
           <Route 
             path="/:username/edit" // Dynamic route for usernames
             element={<UserEdit />} // Add the route for UserPage

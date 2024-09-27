@@ -2,68 +2,77 @@
 @import url('https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap');
 
 .bg {
-    opacity: 100%;
+    opacity: 1; /* Full visibility */
     background: rgba(222, 213, 229, 0.73);
-    width: 100%; /* Ensures responsiveness */
-    height: 100%; /* Maintains aspect ratio */
-  }
-  .stats-lander {
+    width: 400px; 
+    height: 100%; 
+    visibility: visible;
+}
+  
+.stats-lander {
     position: relative;
-    opacity: 100%;
+    opacity: 1; /* Full visibility */
     background: rgba(140, 104, 170, 0.73);
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     border-radius: 0px 0px 00px 00px;
-    width: 100%; /* Ensures responsiveness */
-    height: auto; /* Maintains aspect ratio */
+    width: 100%;
+    height: auto;
     padding-bottom: 20px;
-
-  }
-  .stats-oval {
-    /* Rectangle 15 */
-    opacity: 100%;
-    width: 80%; /* Ensures responsiveness */
-    height: auto; /* Maintains aspect ratio */
+    visibility: visible;
+}
+  
+.stats-oval {
+    opacity: 1; /* Full visibility */
+    width: 80%;
+    height: auto;
     background: #724598;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     border-radius: 100px;
     margin: 0 auto;    
     padding-top: 10px;
-    padding-bottom: 10px;   
-
-  }
-  .stats-label {
+    padding-bottom: 10px;
+    visibility: visible;
+}
+  
+.stats-label {
     font-family: 'Secular One', Georgia, 'Times New Roman', Times, serif;
     font-size: 32px;
     color: white;
-    opacity: 100%;
-  }
-  .hashtag-label {
+    opacity: 1; /* Full visibility */
+    visibility: visible;
+}
+  
+.hashtag-label {
     font-family: 'Secular One', Georgia, 'Times New Roman', Times, serif;
-    /* font-weight: bold; */
     font-size: 20px;
     color: white;
-    opacity: 100%;
-  }
-  .centered-div {
+    opacity: 1; /* Full visibility */
+    visibility: visible;
+}
+
+.centered-div {
     padding-top: 15px;
     display: flex;
-    justify-content: center; /* Horizontal centering */
-    align-items: center; /* Vertical centering */
-    text-align: center; /* Center text inside the div */
+    justify-content: center;
+    align-items: center;
+    text-align: center;
     margin: 0 auto;
-  }
-  .car-label {
+    visibility: visible;
+}
+
+.car-label {
     font-family: 'Kumbh Sans', Georgia, 'Times New Roman', Times, serif;
     font-weight: bolder;
     letter-spacing: 1px;
     font-size: 35px;
     color: white;
-    opacity: 100%;
+    opacity: 1; /* Full visibility */
     padding-bottom: 10px;
     padding-top: 10px;
+    visibility: visible;
+}
 
-  }
-  .car-info {
+.car-info {
     width: 80%;
     max-width: 600px;
     margin-bottom: 20px;
@@ -71,23 +80,29 @@
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  }
-  .rounded-bottom-img {
-    border-bottom-left-radius: 20px; /* Adjust as needed */
+    visibility: visible;
+}
+
+.rounded-bottom-img {
+    border-bottom-left-radius: 20px;
     border-bottom-right-radius: 20px;
-    width: 100%; /* Ensures responsiveness */
-    height: auto; /* Maintains aspect ratio */
-  }
+    width: 100%;
+    height: auto;
+    visibility: visible;
+}
   
-  .car-img {
+.car-img {
     margin-bottom: -25px;
-    opacity: 100%;
+    opacity: 1; /* Full visibility */
     width: 100%;
     height: auto;
     display: block;
     border-radius: 10px;
-  }
-  
+    visibility: visible;
+}
+
+/* The remaining styles unchanged, as they didn't have any opacity issues */
+
   .header {
     display: flex;
     justify-content: space-between;
@@ -165,7 +180,7 @@
   }
   
   .slider {
-    width: 550px; /* Ensures responsiveness */
+    width: 350px; /* Ensures responsiveness */
     height: 50px; /* Maintains aspect ratio */
     cursor: pointer; /* Changes cursor on hover */
     background-color: #ccc; /* Default background color */
@@ -182,7 +197,7 @@
   
   /* Circle inside the toggle */
   .slider:before {
-    width: 300px; /* Ensures responsiveness */
+    width: 200px; /* Ensures responsiveness */
     height: 50px; /* Maintains aspect ratio */
     content: ""; /* Empty content */
     position: absolute;
@@ -193,7 +208,7 @@
   
   /* Move the circle to the right when checked */
   input:checked + .slider:before {
-    transform: translateX(250px); /* Move circle */
+    transform: translateX(150px); /* Move circle */
   }
   
   /* Style for the toggle labels */
@@ -257,4 +272,7 @@
 
 #conditional-button:hover {
   background: grey;
+}
+.vis {
+  visibility: visible;
 }
