@@ -4,6 +4,7 @@ import axios from 'axios';
 //const CLERK_API_KEY = "sk_test_NUjYYxQVKy0DVj0vPgEcFWFORIQJYilZIJyVSeHTEX";  // Use your environment variable setup
 
 export async function onRequestGet(context) {
+  console.log("Function started")
   const CLERK_API_KEY  = context.env.REACT_APP_CLERK_SECRET_KEY;
   try {
     // Make a request to the Clerk API to get the user list

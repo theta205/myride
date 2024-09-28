@@ -2,7 +2,6 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
 import './page.css'
-import miata from './images/miata.png'
 
 import Image from 'react-bootstrap/Image';
 import Container from 'react-bootstrap/Container';
@@ -50,13 +49,13 @@ const  UserPage = () => {
       return <div>Loading...</div>;
   }
   return ( 
- <Container className="d-flex justify-content-center vh-100">
+<Container className="d-flex justify-content-center vh-100">
   <Row>
-    <Col> 
-     <div className='bg '>
+    <Col>
+      <div className='bg '> 
         <div className="stats-lander " style = {{width:'auto'}}>
           <Image 
-            src={miata}
+            src= "/images/miata.png"
             className="img-fluid"
             style={{
               width: "auto", 
@@ -66,24 +65,20 @@ const  UserPage = () => {
             }} 
           />
           <div style={{ textAlign: 'center' }}>
-            <h1 className = "vis car-label">1999 Mazda Miata</h1>
+            <h1 className = "car-label">1999 Mazda Miata</h1>
           </div>
-          <div className="stats-oval text-center">
-            <Row xs='auto' className="justify-content-center ">
-              <Col> <span className="stats-label" >140 hp</span></Col>
+          <div className="stats-oval">
+            <Row xs ='auto' className="justify-content-center ">
+              <Col > <span className="stats-label" >140 hp</span></Col>
               <Col> <span className="stats-label" >119 ft/lbs</span></Col>
               <Col> <span className="stats-label" >RWD</span></Col>
             </Row>
           </div>
-            <Row xs='auto' className="centered-div justify-content-center "> 
-           
-              <Col> <span className="hashtag-label" >#Stance</span></Col>
-              <Col> <span className="hashtag-label" >#JDM</span></Col>
-              <Col> <span className="hashtag-label" >#LowBoys</span></Col>
-              <Col> <span className="hashtag-label" >#NA</span></Col>
-              <Col> <span className="hashtag-label" >#DropTop</span></Col>
+            <Row xs={1} className="centered-div justify-content-center " style={{ marginRight: '30px',marginLeft: '30px' }}> 
+            {/* max 5 hastags*/}
+              <Col> <span className="hashtag-label" >#Stance #JDM #LowBoys #NA #DropTop</span></Col>
             </Row>
-        </div> 
+        </div>
         <div className="toggle-container" style={{ paddingTop: '20px' }}>
           <label className="toggle-button">
             <input type="checkbox" />
