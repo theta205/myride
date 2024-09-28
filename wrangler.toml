@@ -13,3 +13,7 @@ bucket = "./build"
 from = "your-domain.com/*"
 to = "/index.html"
 status = 200
+
+[vars]
+REACT_APP_CLERK_PUBLISHABLE_KEY= "pk_test_aG9wZWZ1bC1zcGFuaWVsLTE4LmNsZXJrLmFjY291bnRzLmRldiQ"
+REACT_APP_CLERK_SECRET_KEY= "sk_test_NUjYYxQVKy0DVj0vPgEcFWFORIQJYilZIJyVSeHTEX"
