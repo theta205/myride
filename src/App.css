@@ -5,6 +5,20 @@
   justify-content: center;
   height: 100vh;
 }
+.custom-login-btn {
+  height: 40px; /* Set to the height of your navbar */
+  display: flex;
+  align-items: center; /* Center vertically */
+  justify-content: center; /* Center horizontally */
+  padding: 0; /* Remove padding */
+  border: none; /* Optional: Remove border for a cleaner look */
+  background: transparent; 
+}
+
+.navbar-nav .nav-link {
+  padding: 1rem; /* Adjust padding to match the height */
+}
+
 
 .titleContainer {
   display: flex;

@@ -10,6 +10,7 @@ import { useClerk } from '@clerk/clerk-react'
 import UserRoute  from './UserRoute';
 import About from './About';
 import Menu from './Menu';
+import Login from './login';
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -27,6 +28,9 @@ function App() {
             element={<Home email={email} loggedIn={loggedIn} setLoggedIn={setLoggedIn} />} 
           />
           <Route path="/about" element={<About />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Login />} />
+          <Route path="/signin" element={<Login />} />
           <Route path="/404" element={<NotFound />} />
           <Route path="/:username" element={<UserRoute />} /> {/* Dynamic route */}
           <Route 

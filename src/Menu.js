@@ -4,37 +4,34 @@ import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import React from 'react';
 import { useUser } from '@clerk/clerk-react';
+import Login from './login';
+import './App.css';
 
 
 function Menu() {
-    let owner
+    let owner;
     const { user, isLoaded, isSignedIn } = useUser();
-    if (user) owner = true
-
-
-  return (
-    <Navbar expand="lg" className="bg-body-tertiary">
-      <Container>
-        <Navbar.Brand href="#home">MyRide</Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="me-auto">
-            <Nav.Link href="/">Home</Nav.Link>
-            <Nav.Link href="/about">About MyRide</Nav.Link>
-            <NavDropdown title="Profile Options" id="basic-nav-dropdown">
-              {owner && <NavDropdown.Item href={"/"+user.username}>My Profile</NavDropdown.Item>}
-              {owner && <NavDropdown.Item href={"/"+user.username+"/edit"}> Edit My Profile</NavDropdown.Item>}
-              <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
-              {/* <NavDropdown.Divider />
-              <NavDropdown.Item href="#action/3.4">
-                Separated link
-              </NavDropdown.Item> */}
-            </NavDropdown>
-          </Nav>
-        </Navbar.Collapse>
-      </Container>
-    </Navbar>
-  );
+  
+    return (
+        <Navbar expand="true" className="bg-body-tertiary">
+            <Container>
+                <Navbar.Brand href="/"style={{ fontSize: '2rem' }}>MyRide</Navbar.Brand>
+                <div className="d-flex align-items-center">
+                    <Login className="btn btn-primary me-2 custom-login-btn" /> {/* Add custom class here */}
+                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                </div>
+                <Navbar.Collapse id="basic-navbar-nav">
+                    <Nav className="me-auto">
+                        <Nav.Link href="/">Home</Nav.Link>
+                        <Nav.Link href="/about">About MyRide</Nav.Link>
+                        {isSignedIn && <Nav.Link href={"/" + user.username}>My Profile</Nav.Link>}
+                        {isSignedIn && <Nav.Link href={"/" + user.username + "/edit"}> Edit My Profile</Nav.Link>}
+                   </Nav>
+                </Navbar.Collapse>
+            </Container>
+        </Navbar>
+    );
+    
 }
 
 export default Menu;
