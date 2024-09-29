@@ -8,6 +8,8 @@ import './App.css';
 import { useUser } from '@clerk/clerk-react';
 import { useClerk } from '@clerk/clerk-react'
 import UserRoute  from './UserRoute';
+import About from './About';
+import Menu from './Menu';
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -24,8 +26,9 @@ function App() {
             path="/" 
             element={<Home email={email} loggedIn={loggedIn} setLoggedIn={setLoggedIn} />} 
           />
-          <Route path="/:username" element={<UserRoute />} /> {/* Dynamic route */}
+          <Route path="/about" element={<About />} />
           <Route path="/404" element={<NotFound />} />
+          <Route path="/:username" element={<UserRoute />} /> {/* Dynamic route */}
           <Route 
             path="/:username/edit" // Dynamic route for usernames
             element={<UserEdit />} // Add the route for UserPage
@@ -33,6 +36,7 @@ function App() {
           {/* You can also add other routes here */}
         </Routes>
       </BrowserRouter>
+      
     </div>
   );
 }

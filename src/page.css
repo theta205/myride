@@ -35,7 +35,9 @@
     justify-content: center;
     text-justify: center;
 }
-  
+#dropdown-circle-toggle::after {
+  display: none; /* Hide the caret */
+}
 .stats-label {
     font-family: 'Secular One', Georgia, 'Times New Roman', Times, serif;
     font-size: 21px;
@@ -277,4 +279,20 @@
 }
 .vis {
   visibility: visible;
+}
+.settings-drop{
+    position: fixed; /* Position relative to the viewport */
+    margin: 0 auto;
+    justify-self: right;
+    right: 0;
+    top: 25px; /* Align to the left */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s ease; /* Smooth transition */
+}
+.settings-overlay{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10px;
+
 }

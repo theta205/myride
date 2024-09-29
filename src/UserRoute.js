@@ -21,10 +21,10 @@ function UserRoute() {
 
         // Check if the user exists in the fetched data
         const userExists = data.some(user => user.username === username);
-      
+        console.log("Userexist? "+ userExists)
         // Navigate if user does not exist
         if (!userExists) {
-          return <span></span>; // Redirect to 404 if user does not exist
+          return <span>User doesn't exist</span>; // Redirect to 404 if user does not exist
         }
       })
       .catch(err => {
@@ -43,7 +43,9 @@ function UserRoute() {
 
   if (user) {
     // If the user exists, render their information
+    console.log("sending to user")
     return (
+      
       <UserPage></UserPage>
     );
   } else {
