@@ -11,13 +11,12 @@ import UserRoute  from './UserRoute';
 import About from './About';
 import Menu from './Menu';
 import Login from './login';
+import Store from './pages/store';
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [email, setEmail] = useState("");
   const { user } = useUser();
-  console.log(user);
-
 
   return (
     <div className="App">
@@ -32,7 +31,9 @@ function App() {
           <Route path="/signup" element={<Login />} />
           <Route path="/signin" element={<Login />} />
           <Route path="/404" element={<NotFound />} />
+          <Route path="/store" element={<Store />} />
           <Route path="/:username" element={<UserRoute />} /> {/* Dynamic route */}
+          {/* <Route path="/api/profiles/:key" element={<Store />}> </Route> */}
           <Route 
             path="/:username/edit" // Dynamic route for usernames
             element={<UserEdit />} // Add the route for UserPage
