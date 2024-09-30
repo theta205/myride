@@ -10,14 +10,24 @@ import Row from 'react-bootstrap/Row';
 import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SettingsDropdown from './SettingsDropdown';
-
+import { useEffect, useState } from 'react';
+import useFetchProfileData from './fetchProfileData';
 
 const  UserPage = () => {
   const { user, isLoaded, isSignedIn } = useUser();
-  
+  const navigate = useNavigate();
+  const [data, setData] = useState({}); // State for profile data
+  const [error, setError] = useState(''); // To capture error messages
+  const [responseMessage, setResponseMessage] = useState(''); // For update success messages
+
+  // Use user.username as the key for the update
+  const key = user?.username || ''; // Fallback to an empty string if user is not available
+
+  // Fetch user profile data when the component mounts and when the user is signed in
+  useFetchProfileData(key, isLoaded, isSignedIn, setData, setError, navigate); // Use the custom hook
+
   if (!isLoaded) {
       return <div>Loading...</div>;
   }
@@ -46,19 +56,19 @@ const  UserPage = () => {
                 </div>
   
                 <div style={{ textAlign: 'center' }}>
-                  <h1 className="car-label">1999 Mazda Miata</h1>
+                  <h1 className="car-label">{data.year} {data.make} {data.model}</h1>
                 </div>
   
                 <div className="stats-oval">
                   <Row xs="auto" className="justify-content-center">
-                    <Col><span className="stats-label">140 hp</span></Col>
-                    <Col><span className="stats-label">119 ft/lbs</span></Col>
-                    <Col><span className="stats-label">RWD</span></Col>
+                    <Col><span className="stats-label">{data.horsepower} hp</span></Col>
+                    <Col><span className="stats-label">{data.torque} ft/lbs</span></Col>
+                    <Col><span className="stats-label">{data.transmission}</span></Col>
                   </Row>
                 </div>
   
                 <Row xs={1} className="centered-div justify-content-center" style={{ marginRight: '30px', marginLeft: '30px' }}>
-                  <Col><span className="hashtag-label">#Stance #JDM #LowBoys #NA #DropTop</span></Col>
+                  <Col><span className="hashtag-label">{data.tags}</span></Col>
                 </Row>
               </div>
               <div className="toggle-container" style={{ paddingTop: '20px' }}>

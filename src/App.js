@@ -11,7 +11,8 @@ import UserRoute  from './UserRoute';
 import About from './About';
 import Menu from './Menu';
 import Login from './login';
-import Store from './pages/store';
+import Store from './store';
+import Test from './test';
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -31,7 +32,7 @@ function App() {
           <Route path="/signup" element={<Login />} />
           <Route path="/signin" element={<Login />} />
           <Route path="/404" element={<NotFound />} />
-          <Route path="/store" element={<Store />} />
+          <Route path="/test" element={<Test />} />
           <Route path="/:username" element={<UserRoute />} /> {/* Dynamic route */}
           {/* <Route path="/api/profiles/:key" element={<Store />}> </Route> */}
           <Route 

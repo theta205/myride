@@ -54,6 +54,28 @@
     opacity: 1; /* Full visibility */
     visibility: visible;
 }
+.the-input {
+  font-family: 'Secular One', Georgia, 'Times New Roman', Times, serif;
+  border-radius: 4px;
+  background: transparent;/* Dark background to match the label */
+  color: white; /* White text for contrast */
+  outline: none;
+  height: 25px;
+  text-align: center;
+  border-width: 1px;
+  border-color: white;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.hashtag-input:focus {
+  background: transparent;
+}
+
+.hashtag-input::placeholder {
+  color: white; /* Lighter gray for placeholder text */
+  opacity: 50%;
+  
+}
 
 .centered-div {
     padding-top: 1px;
