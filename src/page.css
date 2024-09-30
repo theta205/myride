@@ -318,3 +318,31 @@
     z-index: 10px;
 
 }
+.popup-content {
+  width: 400px;
+  height: 400px; /* Set the width of the popup */
+  padding: 10px; /* Optional: Add padding for better spacing */
+  background-color: white; /* Background color */
+  border-radius: 8px; /* Optional: Rounded corners */
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Optional: Shadow for depth */
+}
+
+/* Ensure the inputs and button fit well within the popup */
+.popup-content input {
+  width: 100%; /* Make input fields full width */
+  margin: 10px 0; /* Spacing betrween inputs */
+  padding: 8px; /* Padding inside input fields */
+}
+
+.popup-content button {
+  padding: 10px 15px; /* Padding for button */
+  background-color: #007bff; /* Button background color */
+  color: white; /* Button text color */
+  border: none; /* No border */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+}
+
+.popup-content button:hover {
+  background-color: #0056b3; /* Darker shade on hover */
+}

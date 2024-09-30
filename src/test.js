@@ -15,7 +15,6 @@ import SettingsDropdown from './SettingsDropdown';
 import UpdateDataComponent from './store';
 import useFetchProfileData from './fetchProfileData';
 import Popup from 'reactjs-popup';
-import 'reactjs-popup/dist/index.css';
 import PopupWithStatInput from './statsPopup';
 function Test() {
     const {  isLoaded  } = useUser();
@@ -101,20 +100,21 @@ function Test() {
                     <button className="bubble-overlay" 
                       style={{
                         position: 'absolute',
-                        top: '0',        // Position at the top
+                        top: '15',        // Position at the top
                         left: '0',       // Align left
                         right: '0',      // Align right
                         bottom: '0',     // Align bottom
                         margin: 'auto',
                         width: '100%',   // Full width
-                        height: '100%',  // Full height
+                        height: '78%',  // Full height
                         background: 'transparent',  // Transparent background
-                        border: '2px solid rgba(255, 255, 255, 0.5)', // Border style
+                        border: 'transparent', // Border style
                         cursor: 'pointer', // Change cursor on hover
                         zIndex: 1, // Ensure it's above other elements
                       }}
                     />
                   }
+                  modal
                 />
               {/* Optionally, add content inside the bubble here */}
         </div>
