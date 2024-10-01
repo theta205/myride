@@ -147,63 +147,61 @@ const PopupWithStatInput = ({ trigger }) => {
     <div>
       <Popup trigger={trigger} position="bottom center" closeOnDocumentClick>
         <div className="popup-content">
-          <h3>Enter Your Details</h3>
-          <form onSubmit={handleSubmit}>
-            <Row>
-              <Col>
-                <Row><label htmlFor="year">Year:</label></Row>
-                <select
-                  name= "year"
-                  className='stats-dropdowns'
-                  value={inputData.year || ''}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="" disabled>Select a year</option>
-                  {years.map((year) => (
-                    <option key={year} value={year}>{year}</option>
-                  ))}
-                </select>
-                </Col>
-            </Row>
+          <h3>Enter Your Cars Info</h3>
+          <form onSubmit={handleSubmit} style={{justifyContent: 'center'}}>
+            <Row><label htmlFor="year">Year:</label></Row>
+                <Row className='stats-rows'>
+                    <select
+                    name= "year"
+                    className='stats-dropdowns'
+                    value={inputData.year || ''}
+                    onChange={handleInputChange}
+                    required
+                    style={{ backgroundColor:'white' }}
+                    >
+                    <option value="" disabled>Select a year</option>
+                    {years.map((year) => (
+                        <option key={year} value={year}>{year}</option>
+                    ))}
+                    </select>
 
-            <Row>
-              <Col>
+                </Row>
                 <Row><label htmlFor="make">Make:</label></Row>
-                <select
-                  name="make"
-                  className='stats-dropdowns'
-                  value={inputData.make || ''}
-                  onChange={handleInputChange}
-                  required
-                  disabled={!inputData.year || (inputData.year === 'Other' && inputData.customYear==='')}
-                  style={{ backgroundColor: !inputData.year ? '#d3d3d3' : 'white' }}
-                >
-                  <option value="" disabled>Select a make</option>
-                  {makes.map((make) => (
-                    <option key={make} value={make}>{make}</option>
-                  ))}
-                    <option value="Other">Other</option> {/* Add Other option */}
+                <Row className='stats-rows'>
+                    <select
+                    name="make"
+                    className='stats-dropdowns'
+                    value={inputData.make || ''}
+                    onChange={handleInputChange}
+                    required
+                    disabled={!inputData.year || (inputData.year === 'Other' && inputData.customYear==='')}
+                    style={{ backgroundColor: !inputData.year ? '#d3d3d3' : 'white' }}
+                    >
+                    <option value="" disabled>Select a make</option>
+                    {makes.map((make) => (
+                        <option key={make} value={make}>{make}</option>
+                    ))}
+                        <option value="Other">Other</option> {/* Add Other option */}
 
-                </select>
-                </Col>
-                <Col>
+                    </select>
+                </Row>
+            <Row style={{ paddingRight: '20px', justifyContent: 'center'}}>
                 {(inputData.make === 'Other') && (
                   <input
                     type="text"
+                    className='stats-dropdowns'
                     name="customMake"
                     placeholder="Enter custom make"
                     value={inputData.customMake}
                     onChange={handleInputChange}
                     required
+                    style={{width: '342px', margin: '10'}}
+                    
                   />
                 )}
-              </Col>
-            </Row>
-
-            <Row>
-              <Col>
+             </Row>
                 <Row><label htmlFor="model">Model:</label></Row>
+            <Row className='stats-rows'>
                 <select
                   name="model"
                   className='stats-dropdowns'
@@ -220,53 +218,55 @@ const PopupWithStatInput = ({ trigger }) => {
                 <option value="Other">Other</option> {/* Add Other option */}
 
                 </select>
-              </Col>
-              <Col>
+                </Row>
+                <Row style={{paddingRight: '20px', justifyContent: 'center'}}>
                 {inputData.model === 'Other' && (
                   <input
                     type="text"
+                    className='stats-dropdowns'
                     name="customModel"
                     placeholder="Enter custom model"
                     value={inputData.customModel}
                     onChange={handleInputChange}
                     required
+                    style={{width: '342px', margin: '10'}}
                   />
                 )}
-              </Col>
-            </Row>
+              </Row>
 
-            <Row>
-              <Col>
-                <label htmlFor="power">Power (hp):</label>
+            <Row xs={3} style={{paddingTop:'10px', width: '98%', paddingLeft: '10px'}}>
+              <Col style={{textAlign: 'center'}}>
+                <label htmlFor="power">Power(hp):</label>
                 <input
                   type="text"
                   name="power"
+                  style={{ width: '100%', height: '37px'}}
                   value={inputData.power}
                   onChange={handleInputChange}
                   required
                 />
               </Col>
-              <Col>
-                <label htmlFor="torque">Torque (lb/ft):</label>
+              <Col style={{textAlign: 'center'}}>
+                <label htmlFor="torque">Torque(lb/ft):</label>
                 <input
                   type="text"
                   name="torque"
+                  style={{ width: '100%', height: '37px'}}
                   value={inputData.torque}
                   onChange={handleInputChange}
                   required
                 />
               </Col>
-              <Col>
-              <label htmlFor="drivetrain">Drivetrain:</label>
-
+              <Col style={{textAlign: 'center'}}>
+              <label htmlFor="drivetrain" style={{paddingBottom: '8px'}} >Drivetrain: </label>
               <select
                     name="drivetrain"
                     value={inputData.drivetrain || ''}
                     onChange={handleInputChange}
                     required
-                    style={{ backgroundColor: 'white' }}
+                    style={{ backgroundColor: 'white', width: '100%', height: '40px'}}
                     >
-                    <option value="">Select drivetrain</option> {/* Default empty option */}
+                    <option value="">Select</option> {/* Default empty option */}
                     <option value="RWD">RWD</option>
                     <option value="AWD">AWD</option>
                     <option value="FWD">FWD</option>
@@ -278,17 +278,20 @@ const PopupWithStatInput = ({ trigger }) => {
 
             <Row>
               <Col>
-                <label htmlFor="hashtag">Hashtag:</label>
+                <label htmlFor="hashtag">Hashtags:</label>
                 <input
                   type="text"
                   name="hashtag"
+                  style={{ width: '100%', height: '37px'}}
                   value={inputData.hashtag}
                   onChange={handleInputChange}
                   required
                 />
               </Col>
             </Row>
-            <button type="submit">Submit</button>
+            <Row style={{justifyContent: 'center'}}>
+            <button type="submit"  style={{width:'90%'}}>Submit</button>
+            </Row>
           </form>
         </div>
       </Popup>

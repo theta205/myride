@@ -1,4 +1,8 @@
 .stats-dropdowns{
-    width: 175px;
+    width: 90%;
     height: 40px;
+}
+.stats-rows{
+    width: 100%;
+    justify-content: center;
 }
