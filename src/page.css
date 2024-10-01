@@ -320,7 +320,7 @@
 }
 .popup-content {
   width: 400px;
-  height: 400px; /* Set the width of the popup */
+  height: 600px; /* Set the width of the popup */
   padding: 10px; /* Optional: Add padding for better spacing */
   background-color: white; /* Background color */
   border-radius: 8px; /* Optional: Rounded corners */
