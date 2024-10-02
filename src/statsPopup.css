@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Secular+One&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap');
-
+/* Base styles for the popup */
 .stats-dropdowns{
     width: 90%;
     height: 40px;
@@ -59,4 +59,8 @@ input[type="number"] {
   padding: 0; /* Remove default padding */
   border: 1px solid #ccc; /* Optional: Add a border for clarity */
 }
-  
+
+.dropdown-m:hover{
+    opacity: 1;
+    background: lightgrey;
+}

@@ -7,10 +7,9 @@ import axios from 'axios';
 import './statsPopup.css'
 import { Form, Dropdown, DropdownButton } from 'react-bootstrap';
 
-const PopupWithStatInput = ({ trigger }) => {
+const PopupWithStatInput = ({ trigger,onSub }) => {
   const [inputData, setInputData] = useState({
     year: '',
-    customYear: '',
     make: '',
     customMake: '',
     model: '',
@@ -18,9 +17,6 @@ const PopupWithStatInput = ({ trigger }) => {
     power: '',
     torque: '',
     drivetrain: '',
-    lightColor: 'mistyrose',
-    mainColor:'lightcoral',
-    darkColor:'indianred',
     hashtags: ""
   });
   const hashtags = [
@@ -40,6 +36,8 @@ const PopupWithStatInput = ({ trigger }) => {
   const [models, setModels] = useState([]);
   const [selectedSet, setSelectedSet] = useState(1); // State to track the selected button set
   const [selectedHashtags, setSelectedHashtags] = useState([]);
+    const [isOpen, setIsOpen] = useState(false); // State for popup animation
+
 
   useEffect(() => {
     if (inputData.year && inputData.year !== 'Other') {
@@ -66,7 +64,6 @@ const PopupWithStatInput = ({ trigger }) => {
         return {
           ...prevData,
           year: value,
-          customYear: '',
           make: '',
           customMake: '',
           model: '',
@@ -93,8 +90,20 @@ const PopupWithStatInput = ({ trigger }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if(inputData.model === "Other"){
+        inputData.model = inputData.customModel;
+    }
+    if(inputData.make === "Other"){
+        inputData.make = inputData.customMake;
+    }
+    delete inputData.customMake;
+    delete inputData.customModel;
     console.log('Submitted Data:', inputData);
     inputData.hashtags = selectedHashtags.join(' ');
+
+    if (onSub) {
+        onSub(inputData);
+      }
   };
 
   const fetchYears = async () => {
@@ -102,7 +111,7 @@ const PopupWithStatInput = ({ trigger }) => {
       const response = await axios.get(
         `https://public.opendatasoft.com/api/records/1.0/search/?dataset=all-vehicles-model&q=&facet=year`
       );
-
+  
       const yearsList = response.data.facet_groups[0]?.facets.map((facet) => parseInt(facet.name)) || [];
       const sortedYears = yearsList.sort((a, b) => b - a);
       const lastYear = sortedYears.length > 0 ? sortedYears[sortedYears.length - 1] : new Date().getFullYear();
@@ -111,36 +120,50 @@ const PopupWithStatInput = ({ trigger }) => {
         additionalYears.push(year);
       }
       const finalYearsList = [...sortedYears, ...additionalYears];
-
+  
       setYears(finalYearsList);
     } catch (error) {
       console.error('Error fetching years:', error);
     }
   };
+  
   fetchYears();
   const fetchMakes = async (year) => {
     try {
       const response = await axios.get(
         `https://public.opendatasoft.com/api/records/1.0/search/?dataset=all-vehicles-model&q=&facet=make&refine.year=${year}`
       );
-      const makesList = response.data.facet_groups[0]?.facets.map((facet) => facet.name) || [];
-      setMakes(makesList.sort());
+  
+      if (response.data.facet_groups && response.data.facet_groups.length > 0) {
+        const makesList = response.data.facet_groups[0]?.facets.map((facet) => facet.name) || [];
+        setMakes(makesList.sort());
+      } else {
+        console.warn('No makes found for the selected year.');
+        setMakes([]);
+      }
     } catch (error) {
       console.error('Error fetching makes:', error);
     }
   };
-
+  
   const fetchModels = async (year, make) => {
     try {
       const response = await axios.get(
         `https://public.opendatasoft.com/api/records/1.0/search/?dataset=all-vehicles-model&q=&facet=model&refine.year=${year}&refine.make=${make}`
       );
-      const modelsList = response.data.facet_groups[0]?.facets.map((facet) => facet.name) || [];
-      setModels(modelsList.sort());
+  
+      if (response.data.facet_groups && response.data.facet_groups.length > 0) {
+        const modelsList = response.data.facet_groups[0]?.facets.map((facet) => facet.name) || [];
+        setModels(modelsList.sort());
+      } else {
+        console.warn('No models found for the selected make and year.');
+        setModels([]);
+      }
     } catch (error) {
       console.error('Error fetching models:', error);
     }
   };
+  
 
   // Handle button selection and deselection logic
   const handleButtonClick = (setIndex) => {
@@ -252,13 +275,13 @@ const PopupWithStatInput = ({ trigger }) => {
   
   return (
     <div>
-      <Popup trigger={trigger} position="bottom center" closeOnDocumentClick style={{justifyContent: 'center', height:"auto"}}>
-        <div className="popup-content" style={{justifyContent: 'center', height:"auto"}}>
+      <Popup trigger={trigger} position="bottom center" closeOnDocumentClick style={{justifyContent: 'center', height:"auto", color : "white", transition: 'opacity 0.3s ease, transform 0.3s ease' }}>
+        <div className="popup-content" style={{justifyContent: 'center', height:"auto",color: 'black', background : "white" }}>
           <h3>Enter Your Cars Info</h3>
           <form onSubmit={handleSubmit} style={{justifyContent: 'center', height:"auto"}}>
             <Row><label htmlFor="year">Year:</label></Row>
                 <Row className='stats-rows'>
-                    <select
+                    <Form.Select
                     name= "year"
                     className='stats-dropdowns'
                     value={inputData.year || ''}
@@ -270,19 +293,20 @@ const PopupWithStatInput = ({ trigger }) => {
                     {years.map((year) => (
                         <option key={year} value={year}>{year}</option>
                     ))}
-                    </select>
+                    </Form.Select>
 
                 </Row>
                 <Row><label htmlFor="make">Make:</label></Row>
                 <Row className='stats-rows'>
-                    <select
+                    <Form.Select
                     name="make"
                     className='stats-dropdowns'
                     value={inputData.make || ''}
                     onChange={handleInputChange}
                     required
-                    disabled={!inputData.year || (inputData.year === 'Other' && inputData.customYear==='')}
-                    style={{ backgroundColor: !inputData.year ? '#d3d3d3' : 'white' }}
+                    disabled={!inputData.year }
+                    style={{ backgroundColor: !inputData.year ? 'rgb(110,117,124)' : 'white' ,
+                    color: !inputData.year ? 'white' : 'black' }}
                     >
                     <option value="" disabled>Select a make</option>
                     {makes.map((make) => (
@@ -290,7 +314,7 @@ const PopupWithStatInput = ({ trigger }) => {
                     ))}
                         <option value="Other">Other</option> {/* Add Other option */}
 
-                    </select>
+                    </Form.Select>
                 </Row>
             <Row style={{ paddingRight: '20px', justifyContent: 'center'}}>
                 {(inputData.make === 'Other') && (
@@ -309,14 +333,16 @@ const PopupWithStatInput = ({ trigger }) => {
              </Row>
                 <Row><label htmlFor="model">Model:</label></Row>
             <Row className='stats-rows'>
-                <select
+                <Form.Select
                   name="model"
                   className='stats-dropdowns'
                   value={inputData.model || ''}
                   onChange={handleInputChange}
                   required
                   disabled={!inputData.make || (inputData.make === 'Other' && inputData.customMake==='')}
-                  style={{ backgroundColor: !inputData.make ? '#d3d3d3' : 'white' }}
+                  style={{ backgroundColor: !inputData.make ? 'rgb(110,117,124)' : 'white' ,
+                   color: !inputData.make ? 'white' : 'black' }}
+
                 >
                   <option value="" disabled>Select a model</option>
                   {models.map((model) => (
@@ -324,7 +350,7 @@ const PopupWithStatInput = ({ trigger }) => {
                   ))}
                 <option value="Other">Other</option> {/* Add Other option */}
 
-                </select>
+                </Form.Select>
                 </Row>
                 <Row style={{paddingRight: '20px', justifyContent: 'center'}}>
                 {inputData.model === 'Other' && (
@@ -366,19 +392,19 @@ const PopupWithStatInput = ({ trigger }) => {
               </Col>
               <Col style={{textAlign: 'center'}}>
               <label htmlFor="drivetrain" style={{paddingBottom: '8px'}} >Drivetrain: </label>
-              <select
+              <Form.Select
                     name="drivetrain"
                     value={inputData.drivetrain || ''}
                     onChange={handleInputChange}
                     required
-                    style={{ backgroundColor: 'white', width: '100%', height: '40px'}}
+                    style={{ backgroundColor: 'rgb(110,117,124)',color:'white', width: '100%', height: '40px'}}
                     >
                     <option value="">Select</option> {/* Default empty option */}
                     <option value="RWD">RWD</option>
                     <option value="AWD">AWD</option>
                     <option value="FWD">FWD</option>
                     <option value="4WD">4WD</option>
-                </select>
+                </Form.Select>
 
               </Col>
             </Row>
@@ -388,38 +414,40 @@ const PopupWithStatInput = ({ trigger }) => {
         <Form.Group controlId="multiSelectHashtags">
             <Form.Label>Select up to 4 Hashtags:</Form.Label>
             <DropdownButton
-                id="dropdown-multiselect"
-                type="button"
-                title={(selectedHashtags.length > 0)? selectedHashtags.join(' ') : 'Select Hashtags'}
-                variant="secondary"
-                style={{ width: '100%' }}
-            >
-                {hashtags.map((hashtag, index) => (
-                    <Dropdown.Item
-                        as="button"
-                        type="button"
-                        style={{ 
-                            width: '90%', 
-                            color: selectedHashtags.length >= 4 && !selectedHashtags.includes(hashtag) ? 'grey' : 'black' ,
-                            pointerEvents: selectedHashtags.length >= 4 && !selectedHashtags.includes(hashtag) ? 'none' : 'auto', // Makes it unclickable
-                            opacity: selectedHashtags.length >= 4 && !selectedHashtags.includes(hashtag) ? 0.5 : 1 // Greyed out effect
-                            }}
-                        key={index}
-                        eventKey={selectedHashtags}
-                        active={selectedHashtags.includes(hashtag)}
-                        onClick={() => handleSelect(hashtag)}
-                        value={selectedHashtags}
-                        onChange={handleInputChange}
-                    >
-                         {hashtag}
-
-                    </Dropdown.Item>
-                ))}
-            </DropdownButton>
+    id="dropdown-multiselect"
+    className='dropdown-m'
+    type="button"
+    title={(selectedHashtags.length > 0) ? selectedHashtags.join(' ') : 'Select Hashtags'}
+    variant="secondary"
+    style={{ width: '160px', background: 'white', color: 'grey' }} // Change color here
+>
+    {hashtags.map((hashtag, index) => (
+        <Dropdown.Item
+            as="button"
+            type="button"
+            style={{
+                width: '90%',
+                color: selectedHashtags.length >= 4 && !selectedHashtags.includes(hashtag) ? 'grey' : 'black',
+                pointerEvents: selectedHashtags.length >= 4 && !selectedHashtags.includes(hashtag) ? 'none' : 'auto', 
+                opacity: selectedHashtags.length >= 4 && !selectedHashtags.includes(hashtag) ? 0.5 : 1,
+                backgroundColor: selectedHashtags.includes(hashtag) ? 'lightgrey' : 'white' // Change selected item color here
+               
+            }}
+            key={index}
+            eventKey={selectedHashtags}
+            active={selectedHashtags.includes(hashtag)}
+            onClick={() => handleSelect(hashtag)}
+            value={selectedHashtags}
+            onChange={handleInputChange}
+        >
+            {hashtag}
+        </Dropdown.Item>
+    ))}
+</DropdownButton>
         </Form.Group>
               </Col>
             </Row>
-            <Row><label htmlFor="hashtag" style={{paddingBottom:'10px'}}>Themes:</label>
+            <Row><label htmlFor="Themes" style={{paddingBottom:'10px'}}>Themes:</label>
             
             </Row>
            <Row style={{paddingBottom: '10px', paddingRight: '10px', paddingLeft: '10px'}}>

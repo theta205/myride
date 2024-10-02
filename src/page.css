@@ -1,6 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Secular+One&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap');
-
+:root{
+--mainColor: lightcoral; /* Default value */
+}
 .bg {
     opacity: 1; /* Full visibility */
     background: rgba(222, 213, 229, 0.73);
@@ -209,7 +211,7 @@
     width: 350px; /* Ensures responsiveness */
     height: 50px; /* Maintains aspect ratio */
     cursor: pointer; /* Changes cursor on hover */
-    background-color: #ccc; /* Default background color */
+    background-color: white; /* Default background color */
     transition: .4s; /* Smooth transition */
     border-radius: 34px; /* Rounded corners */
     display: flex; /* Use flexbox for the inner labels */
@@ -227,7 +229,7 @@
     height: 50px; /* Maintains aspect ratio */
     content: ""; /* Empty content */
     position: absolute;
-    background-color: rgba(140, 104, 170, 0.73); /* Circle color */
+    background-color: var(--mainColor);
     transition: .4s; /* Smooth transition */
     border-radius: 34px; /* Rounded corners */
   }
@@ -236,6 +238,7 @@
   input:checked + .slider:before {
     transform: translateX(150px); /* Move circle */
   }
+
   
   /* Style for the toggle labels */
   .toggle-label {
@@ -243,6 +246,8 @@
     font-size: 20px;
     color: white;
     transition: font-size 0.4s ease, color 0.4s ease; 
+    transition: 0.4s ease;
+
     position: absolute;
     width: 50%; /* Adjust width so the label takes up half the slider */
     text-align: center; /* Center the label text */
@@ -265,18 +270,21 @@
   .toggle-button input:checked + .slider .toggle-label.off {
     color: black; /* Show 'On' when checked */
     font-size: 17px;
-
+    translate: -10px;
   }
   
    .toggle-button input:not(:checked) + .slider .toggle-label.off {
     color: white;
     font-size: 20px;
 
+
   }
   
   .toggle-button input:not(:checked) + .slider .toggle-label.on {
     color: black; 
     font-size: 17px;
+    translate: 10px;
+
 
   }
   #conditional-button {
@@ -336,7 +344,7 @@
 
 .popup-content-button {
   padding: 10px 15px; /* Padding for button */
-  background-color: #007bff; /* Button background color */
+  background-color:rgb(110,117,124); /* Button background color */
   color: white; /* Button text color */
   border: none; /* No border */
   border-radius: 5px; /* Rounded corners */
@@ -344,5 +352,5 @@
 }
 
 .popup-content button:hover {
-  background-color: #0056b3; /* Darker shade on hover */
+  background-color: rgb(50,50,50); /* Darker shade on hover */
 }
