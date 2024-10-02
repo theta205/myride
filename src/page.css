@@ -334,13 +334,13 @@
   padding: 8px; /* Padding inside input fields */
 }
 
-.popup-content button {
+.popup-content-button {
   padding: 10px 15px; /* Padding for button */
   background-color: #007bff; /* Button background color */
   color: white; /* Button text color */
   border: none; /* No border */
   border-radius: 5px; /* Rounded corners */
-  cursor: pointer; /* Pointer cursor on hover */
+   cursor: pointer; /*Pointer cursor on hover */
 }
 
 .popup-content button:hover {

@@ -127,7 +127,6 @@ function Test() {
             </span>
           </label>
         </div>
-        <PopupWithStatInput></PopupWithStatInput>
       </div>
     </Col>
   </Row>

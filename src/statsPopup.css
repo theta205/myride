@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Secular+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap');
+
 .stats-dropdowns{
     width: 90%;
     height: 40px;
@@ -6,3 +9,54 @@
     width: 100%;
     justify-content: center;
 }
+.color-button{
+    width: 30px;
+    height: 30px;
+    border-radius: 0px;
+    border-width: 0px;
+    border-color: black;
+    text-align: 'center';
+    cursor: pointer;
+    margin: 0 'auto';
+}
+.group-button{
+    width: 33px;
+    height: 93px;
+    border-width: 2px;
+    border-color: black;
+    text-align: 'center';
+    cursor: pointer;
+    justify-content: center;
+    margin: 0 'auto';
+}
+.popup-dropdown {
+    position: absolute;
+    top: 40px; /* Adjust this to position the dropdown */
+    left: 0; /* Adjust this to align the dropdown */
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000; /* Ensure dropdown is above other elements */
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .popup-dropdown label {
+    margin: 5px 0;
+  }
+/* Remove arrows for Chrome, Safari, Edge, and Opera */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none; /* Removes the spinner buttons */
+  margin: 0;
+}
+
+/* Remove arrows for Firefox */
+input[type="number"] {
+  /* Using padding to offset the visual appearance */
+  padding: 0; /* Remove default padding */
+  border: 1px solid #ccc; /* Optional: Add a border for clarity */
+}
+  
