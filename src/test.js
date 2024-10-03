@@ -16,6 +16,7 @@ import UpdateDataComponent from './store'; // Unused? If not needed, remove
 import useFetchProfileData from './fetchProfileData'; // Unused? If not needed, remove
 import Popup from 'reactjs-popup';
 import PopupWithStatInput from './statsPopup';
+import PopupForMods from './modPopup';
 
 function Test() {
   const { isLoaded } = useUser();
@@ -49,10 +50,23 @@ function Test() {
 
 }, [inputData]); // Runs every time inputData changes
 
+// Initialize the state with false (off)
+const [isToggled, setIsToggled] = useState(false);
+
+// Function to handle the toggle switch change
+const handleToggle = () => {
+  setIsToggled(prevState => !prevState);
+};
   // Handle loading state
   if (!isLoaded) {
     return <div>Loading...</div>;
   }
+  const rowsData = [
+    { id: 1, content: 'First row content' },
+    { id: 2, content: 'Second row content' },
+    { id: 3, content: 'Third row content' },
+    // You can add as many objects as needed here.
+  ];
 
   // Use useEffect to set initial data on mount
 
@@ -61,7 +75,7 @@ function Test() {
       <Row>
         <Col></Col>
         <Col>
-          <div className="bg" style={{ background: inputData.lightColor }}>
+          <div className="bg" style={{ height: "1000px" ,background: inputData.lightColor }}>
             <div className="stats-lander" style={{ width: 'auto', position: 'relative', background: inputData.mainColor }}>
               
               {/* Image of the Miata */}
@@ -124,16 +138,39 @@ function Test() {
                 onSub={handleDataSubmit} // Pass the submit handler correctly
               />
             </div>
-            
-            <div className="toggle-container" style={{ paddingTop: '20px' }}>
+            <div className="toggle-container" style={{ paddingTop: '20px',paddingBottom: '20px' }}>
               <label className="toggle-button">
-                <input type="checkbox" />
+                <input type="checkbox" 
+                onChange={handleToggle}
+                />
                 <span className="slider">
                   <span className="toggle-label off">Cosmetics</span>
                   <span className="toggle-label on">Performance</span>
                 </span>
               </label>
             </div>
+            <Col style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+                {rowsData.map((row) => (
+                    <Row key={row.id} className='mod'>
+                        <div className='mod-head'style={{marginTop:'-5px'}}>{row.content}</div>
+                        <text className='mod-descrip'> hkfnsdfks</text>
+                    </Row>
+                ))}
+                <Row style={{width:'348px' }}>
+                    <PopupForMods trigger={ 
+                        <button 
+                            className='plus-mod'
+                            type="button"
+                            style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}
+                            >
+                            <h1 style={{paddingTop: '8px'}}>&#x2795;</h1>
+                        </button>
+                    }
+                    modals
+                    modtype={isToggled}
+                    />
+                </Row>
+            </Col>
           </div>
         </Col>
       </Row>

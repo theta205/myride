@@ -9,6 +9,7 @@
     width: 400px; 
     height: 100%; 
     visibility: visible;
+    justify-content: center;
 }
   
 .stats-lander {
@@ -327,7 +328,7 @@
 
 }
 .popup-content {
-  width: 400px;
+  width: 390px;
   height: 600px; /* Set the width of the popup */
   padding: 10px; /* Optional: Add padding for better spacing */
   background-color: white; /* Background color */
@@ -346,11 +347,55 @@
   padding: 10px 15px; /* Padding for button */
   background-color:rgb(110,117,124); /* Button background color */
   color: white; /* Button text color */
-  border: none; /* No border */
+  border: none;
   border-radius: 5px; /* Rounded corners */
    cursor: pointer; /*Pointer cursor on hover */
 }
 
 .popup-content button:hover {
   background-color: rgb(50,50,50); /* Darker shade on hover */
+}
+.plus-mod{
+  width: 348px;
+  height: 60px;
+  background: white;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 12px;
+  align-content: center;
+  justify-content: center;
+  display: flex;
+  opacity: 1;
+  border: 0;
+}
+.plus-mod:hover{
+  background: rgb(242, 242, 242)
+}
+.mod{
+  width: 348px;
+  height: 60px;
+  background: white;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 12px;
+  align-content: center;
+  justify-content: center;
+  display: flex;
+  opacity: 1;
+  border: 0;
+  margin-bottom: 10px;
+}
+.popup-title-div{
+
+  width: 100%;
+  padding: 10px; /* Optional: Add padding for better spacing */
+  margin-right: 10px;
+  background-color: white; /* Background color */
+  border-radius: 8px; /* Optional: Rounded corners */
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Optional: Shadow for depth */
+  text-align: center;
+}
+.mod-head{
+  font-size: 18px;
+}
+.mod-descrip{
+  font-size: 12px;
 }
