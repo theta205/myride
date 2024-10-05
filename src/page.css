@@ -329,7 +329,7 @@
 }
 .popup-content {
   width: 390px;
-  height: 600px; /* Set the width of the popup */
+  height: auto; /* Set the width of the popup */
   padding: 10px; /* Optional: Add padding for better spacing */
   background-color: white; /* Background color */
   border-radius: 8px; /* Optional: Rounded corners */
@@ -384,18 +384,51 @@
   margin-bottom: 10px;
 }
 .popup-title-div{
-
   width: 100%;
   padding: 10px; /* Optional: Add padding for better spacing */
   margin-right: 10px;
   background-color: white; /* Background color */
   border-radius: 8px; /* Optional: Rounded corners */
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Optional: Shadow for depth */
-  text-align: center;
+  text-align: left;
+  height: auto
 }
+.mod-fade-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.mod-fade-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 500ms, transform 500ms;
+}
+.mod-fade-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+.mod-fade-exit-active {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 500ms, transform 500ms;
+}
+
 .mod-head{
   font-size: 18px;
+  font-weight: bold;
 }
 .mod-descrip{
   font-size: 12px;
+  
+}
+.otherModInput[disabled] {
+  background-color: #d3d3d3; /* Light gray background */
+  color: #7a7a7a; /* Darker gray text */
+  cursor: not-allowed; /* Show a not-allowed cursor */
+  border: 1px solid #ccc; /* Optional: border style */
+}
+.otherModInput {
+  background-color: #ededed; /* Light gray background */
+  color: #7a7a7a; /* Darker gray text */
+  cursor: pointer;
+  border: 1px solid #ccc; /* Optional: border style */
 }
