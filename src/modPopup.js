@@ -26,13 +26,23 @@ const PopupForMods = ({ trigger, modtype, onSub }) => {
         e.preventDefault(); // Prevent page reload
         if (theModType && selectedMod) {
             // Add selected mod to modList array
-            setModList((prevMods) => [...prevMods, {  type: modtype, mod: selectedMod, details: details}]);
-            console.log(modList)
-            if (onSub) {
-                onSub([...modList, { type: modtype, mod: selectedMod, details: details}]);
-                
-            }
-            handleClose();
+            setModList((prevMods) => {
+                const newMods = [...prevMods, { type: modtype, mod: selectedMod, details: details }];
+                if (onSub) {
+                    // Create the object that includes modList as a property
+                    const formData = {
+                        mods: newMods, // Giving it a name "mods"
+                        // You can add other properties here if needed
+                        // For example:
+                        // otherData: someOtherData
+                    };
+                    
+                    onSub(formData); // Pass the formData object to onSub
+                }
+                console.log(newMods); // Log the new state
+                return newMods; // Update state
+            });
+            handleClose(); // Close the modal or form
         }
     };
 

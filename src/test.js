@@ -157,6 +157,7 @@ function Test() {
                         <div className='mod-head' style={{ marginTop: '-5px' }}>{row.mod}</div>
                         <text className='mod-descrip'> {row.details}</text>
                       </Row>
+                      
                     </CSSTransition>
                   )
                 ))}

@@ -7,14 +7,17 @@ const useFetchProfileData = (key, isLoaded, isSignedIn, setData, setError, navig
         try {
           const response = await fetch(`/api/getprofiles/${key}`);
           if (!response.ok) {
+            console.log("Error")
             throw new Error('Failed to fetch profile data');
           }
           const profileData = await response.json();
           setData(profileData); // Update state with fetched data
         } catch (err) {
           setError(err.message);
+          console.log("Error")
         }
       };
+      console.log("fetching")
 
       fetchData();
     } else if (isLoaded && !isSignedIn) {

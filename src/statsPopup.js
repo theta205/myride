@@ -274,10 +274,10 @@ const PopupWithStatInput = ({ trigger,onSub }) => {
 
   
   return (
-    <div style={{height:"auto"}}>
+    <div style={{height:"auto", display: 'flex'}}>
       <Popup trigger={trigger} className="popup-content"  position="bottom center" closeOnEscape closeOnDocumentClick style={{justifyContent: 'center', height:"auto", color : "white", transition: 'opacity 0.3s ease, transform 0.3s ease' }}>
-          <h3>Enter Your Cars Info</h3>
           <form onSubmit={handleSubmit} style={{justifyContent: 'center', height:"auto"}}>
+            <Col style={{justifyContent:'center'}}>          <h3>Enter Your Cars Info</h3>
             <Row><label htmlFor="year">Year:</label></Row>
                 <Row className='stats-rows'>
                     <Form.Select
@@ -621,6 +621,7 @@ const PopupWithStatInput = ({ trigger,onSub }) => {
                  Submit
                 </button>
                 </Row> 
+                </Col>
 
           </form>
       </Popup>

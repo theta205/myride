@@ -14,29 +14,60 @@ import { useNavigate } from 'react-router-dom';
 import SettingsDropdown from './SettingsDropdown';
 import { useEffect, useState } from 'react';
 import useFetchProfileData from './fetchProfileData';
+import { CSSTransition, TransitionGroup } from 'react-transition-group'; // Import transitions
 
 const  UserPage = () => {
   const { user, isLoaded, isSignedIn } = useUser();
   const navigate = useNavigate();
-  const [data, setData] = useState({}); // State for profile data
+  const {username }= useParams();
+  const [data, setData] = useState(null); // State for profile data
   const [error, setError] = useState(''); // To capture error messages
   const [responseMessage, setResponseMessage] = useState(''); // For update success messages
+  const [isToggled, setIsToggled] = useState(false);
 
   // Use user.username as the key for the update
-  const key = user?.username || ''; // Fallback to an empty string if user is not available
+  const key = username; // Fallback to an empty string if user is not available
 
-  // Fetch user profile data when the component mounts and when the user is signed in
   useFetchProfileData(key, isLoaded, isSignedIn, setData, setError, navigate); // Use the custom hook
+  useEffect(() => {
+    // Set the main color in the document's style
+    if (data) {
+      document.documentElement.style.setProperty('--mainColor', data.mainColor);
+    }
+  }, [data]);
+  useEffect(() => {
+    // Set default data if inputData is null or there's an error
+    if (!data || error) {
+      const def = {
+        year: "Year",
+        make: "Make",
+        model: "Model",
+        power: "0",
+        torque: "0",
+        drivetrain: "RWD",
+        hashtags: "#hashtag",
+        lightColor: "bisque",
+        mainColor: "lightsalmon",
+        darkColor: "darksalmon",
+        mods: []
+      };
+      setData(def);
+    }
+  }, [data, error]); // Trigger this effect based on changes to inputData or error
 
   if (!isLoaded) {
       return <div>Loading...</div>;
   }
+  const handleToggle = () => {
+    setIsToggled(prevState => !prevState);
+  };
+
   return ( 
 <Container className="d-flex justify-content-center vh-100">
         <Row>
           <Col>
-            <div className="bg">
-              <div className="stats-lander" style={{ width: 'auto', position: 'relative' }}>
+          <div className="bg" style={{ height: "1000px", background: data.lightColor }}>
+          <div className="stats-lander" style={{ position: 'relative', background: data.mainColor }}>
                 
                 {/* Image of the Miata */}
                 <Image
@@ -59,27 +90,62 @@ const  UserPage = () => {
                   <h1 className="car-label">{data.year} {data.make} {data.model}</h1>
                 </div>
   
-                <div className="stats-oval">
+                <div className="stats-oval" style={{ position: 'relative', background: data.darkColor }}>
+
                   <Row xs="auto" className="justify-content-center">
-                    <Col><span className="stats-label">{data.horsepower} hp</span></Col>
+                    <Col><span className="stats-label">{data.power} hp</span></Col>
                     <Col><span className="stats-label">{data.torque} ft/lbs</span></Col>
-                    <Col><span className="stats-label">{data.transmission}</span></Col>
+                    <Col><span className="stats-label">{data.drivetrain}</span></Col>
                   </Row>
                 </div>
   
                 <Row xs={1} className="centered-div justify-content-center" style={{ marginRight: '30px', marginLeft: '30px' }}>
-                  <Col><span className="hashtag-label">{data.tags}</span></Col>
+                  <Col><span className="hashtag-label">{data.hashtags}</span></Col>
                 </Row>
               </div>
-              <div className="toggle-container" style={{ paddingTop: '20px' }}>
-                <label className="toggle-button">
-                  <input type="checkbox" />
+              <div className="toggle-container" style={{ padding: '20px 0' }}>
+                <label className="toggle-button" type='button'>
+                  <input type="checkbox" onChange={handleToggle} />
                   <span className="slider">
                     <span className="toggle-label off">Cosmetics</span>
                     <span className="toggle-label on">Performance</span>
                   </span>
                 </label>
               </div>
+              {/* Mod List */}
+            <Col style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+              <TransitionGroup>
+                {isToggled && data.mods&& data.mods.map((row) => (
+                  row.type && (
+                    <CSSTransition
+                      key={row.mod}
+                      timeout={500}
+                      classNames="mod-fade" // CSS class for the animation
+                    >
+                      <Row className='mod'>
+                        <div className='mod-head' style={{ marginTop: '-5px' }}>{row.mod}</div>
+                        <text className='mod-descrip'> {row.details}</text>
+                      </Row>
+                      
+                    </CSSTransition>
+                  )
+                ))}
+                {!isToggled &&data.mods&& data.mods.map((row) => (
+                  !row.type && (
+                    <CSSTransition
+                      key={row.mod}
+                      timeout={500}
+                      classNames="mod-fade"
+                    >
+                      <Row className='mod'>
+                        <div className='mod-head' style={{ marginTop: '-5px' }}>{row.mod}</div>
+                        <text className='mod-descrip'> {row.details}</text>
+                      </Row>
+                    </CSSTransition>
+                  )
+                ))}
+              </TransitionGroup>
+            </Col>
             </div>
           </Col>
         </Row>
