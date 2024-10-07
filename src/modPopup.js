@@ -189,7 +189,7 @@ const PopupForMods = ({ trigger, modtype, onSub }) => {
     };
 
     return (
-        <Popup
+       <Popup
             trigger={trigger}
             onOpen={handleOpen}
             onClose={handleClose}
@@ -207,7 +207,7 @@ const PopupForMods = ({ trigger, modtype, onSub }) => {
                 opacity: isOpen ? 1 : 0,
             }}
         >
-            <div style={{ justifyContent: 'center', width: "90%", height: "auto", color: 'black', background: "white" }}>
+            { isOpen &&  <div style={{ justifyContent: 'center', width: "90%", height: "auto", color: 'black', background: "white" }}>
                 <div><h3>Enter Your Mods Info</h3></div>
                 <form onSubmit={handleSubmit}>
                     <Row>
@@ -273,7 +273,7 @@ const PopupForMods = ({ trigger, modtype, onSub }) => {
                         </button>
                     </Row>
                 </form>
-            </div>
+            </div> }
         </Popup>
     );
 };

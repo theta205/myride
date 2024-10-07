@@ -175,7 +175,7 @@ function Test() {
                   )
                 ))}
               </TransitionGroup>
-              <Row style={{ width: '348px' }}>
+              <Row style={{ width: '348px', justifyContent: 'center' }}>
                 <PopupForMods
                   trigger={
                     <button

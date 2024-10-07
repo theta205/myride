@@ -275,7 +275,7 @@ const PopupWithStatInput = ({ trigger,onSub }) => {
   
   return (
     <div style={{height:"auto"}}>
-      <Popup trigger={trigger} className="popup-content"  position="bottom center" closeOnDocumentClick style={{justifyContent: 'center', height:"auto", color : "white", transition: 'opacity 0.3s ease, transform 0.3s ease' }}>
+      <Popup trigger={trigger} className="popup-content"  position="bottom center" closeOnEscape closeOnDocumentClick style={{justifyContent: 'center', height:"auto", color : "white", transition: 'opacity 0.3s ease, transform 0.3s ease' }}>
           <h3>Enter Your Cars Info</h3>
           <form onSubmit={handleSubmit} style={{justifyContent: 'center', height:"auto"}}>
             <Row><label htmlFor="year">Year:</label></Row>

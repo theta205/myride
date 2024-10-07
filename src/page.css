@@ -333,13 +333,14 @@
   padding: 10px; /* Optional: Add padding for better spacing */
   background-color: white; /* Background color */
   border-radius: 8px; /* Optional: Rounded corners */
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Optional: Shadow for depth */
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex /* Optional: Shadow for depth */
 }
 
 /* Ensure the inputs and button fit well within the popup */
 .popup-content input {
   width: 100%; /* Make input fields full width */
-  margin: 10px 0; /* Spacing betrween inputs */
+   margin: 10px 0; /* Spacing betrween inputs */
   padding: 8px; /* Padding inside input fields */
 }
 
