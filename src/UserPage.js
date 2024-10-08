@@ -2,7 +2,6 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
 import './page.css'
-
 import Image from 'react-bootstrap/Image';
 import Container from 'react-bootstrap/Container';
 import Col from 'react-bootstrap/Col';
@@ -19,41 +18,42 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group'; // Impo
 const  UserPage = () => {
   const { user, isLoaded, isSignedIn } = useUser();
   const navigate = useNavigate();
-  const {username }= useParams();
-  const [data, setData] = useState(null); // State for profile data
+  const { username }= useParams();
   const [error, setError] = useState(''); // To capture error messages
   const [responseMessage, setResponseMessage] = useState(''); // For update success messages
   const [isToggled, setIsToggled] = useState(false);
+  const [tryedFetch, setTryedFetch] = useState(false);
+
+  const def = {
+    year: "1995",
+    make: "Mazda", 
+    model: "MX-5 Miata",
+    power: "0",
+    torque: "0",
+    drivetrain: "RWD",
+    hashtags: "#hashtag",
+    lightColor: "bisque",
+    mainColor: "lightsalmon",
+    darkColor: "darksalmon",
+    mods: []
+};
+
+  const [inputData, setData] = useState(def);
 
   // Use user.username as the key for the update
-  const key = username; // Fallback to an empty string if user is not available
+  
+  const key = username
+  useFetchProfileData( key, isSignedIn, tryedFetch, setTryedFetch, inputData, setData, setError, navigate)
+  
+  
 
-  useFetchProfileData(key, isLoaded, isSignedIn, setData, setError, navigate); // Use the custom hook
   useEffect(() => {
     // Set the main color in the document's style
-    if (data) {
-      document.documentElement.style.setProperty('--mainColor', data.mainColor);
+    if (inputData) {
+      document.documentElement.style.setProperty('--mainColor', inputData.mainColor);
     }
-  }, [data]);
-  useEffect(() => {
-    // Set default data if inputData is null or there's an error
-    if (!data || error) {
-      const def = {
-        year: "Year",
-        make: "Make",
-        model: "Model",
-        power: "0",
-        torque: "0",
-        drivetrain: "RWD",
-        hashtags: "#hashtag",
-        lightColor: "bisque",
-        mainColor: "lightsalmon",
-        darkColor: "darksalmon",
-        mods: []
-      };
-      setData(def);
-    }
-  }, [data, error]); // Trigger this effect based on changes to inputData or error
+  }, [inputData]);
+
 
   if (!isLoaded) {
       return <div>Loading...</div>;
@@ -61,13 +61,13 @@ const  UserPage = () => {
   const handleToggle = () => {
     setIsToggled(prevState => !prevState);
   };
-
+  console.log("data",inputData)
   return ( 
 <Container className="d-flex justify-content-center vh-100">
         <Row>
           <Col>
-          <div className="bg" style={{ height: "1000px", background: data.lightColor }}>
-          <div className="stats-lander" style={{ position: 'relative', background: data.mainColor }}>
+          <div className="bg" style={{ height: "1000px", background: inputData.lightColor }}>
+          <div className="stats-lander" style={{ position: 'relative', background: inputData.mainColor }}>
                 
                 {/* Image of the Miata */}
                 <Image
@@ -87,20 +87,20 @@ const  UserPage = () => {
                 </div>
   
                 <div style={{ textAlign: 'center' }}>
-                  <h1 className="car-label">{data.year} {data.make} {data.model}</h1>
+                  <h1 className="car-label">{inputData.year} {inputData.make} {inputData.model}</h1>
                 </div>
   
-                <div className="stats-oval" style={{ position: 'relative', background: data.darkColor }}>
+                <div className="stats-oval" style={{ position: 'relative', background: inputData.darkColor }}>
 
                   <Row xs="auto" className="justify-content-center">
-                    <Col><span className="stats-label">{data.power} hp</span></Col>
-                    <Col><span className="stats-label">{data.torque} ft/lbs</span></Col>
-                    <Col><span className="stats-label">{data.drivetrain}</span></Col>
+                    <Col><span className="stats-label">{inputData.power} hp</span></Col>
+                    <Col><span className="stats-label">{inputData.torque} ft/lbs</span></Col>
+                    <Col><span className="stats-label">{inputData.drivetrain}</span></Col>
                   </Row>
                 </div>
   
                 <Row xs={1} className="centered-div justify-content-center" style={{ marginRight: '30px', marginLeft: '30px' }}>
-                  <Col><span className="hashtag-label">{data.hashtags}</span></Col>
+                  <Col><span className="hashtag-label">{inputData.hashtags}</span></Col>
                 </Row>
               </div>
               <div className="toggle-container" style={{ padding: '20px 0' }}>
@@ -115,7 +115,7 @@ const  UserPage = () => {
               {/* Mod List */}
             <Col style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
               <TransitionGroup>
-                {isToggled && data.mods&& data.mods.map((row) => (
+                {isToggled && inputData.mods&& inputData.mods.map((row) => (
                   row.type && (
                     <CSSTransition
                       key={row.mod}
@@ -130,7 +130,7 @@ const  UserPage = () => {
                     </CSSTransition>
                   )
                 ))}
-                {!isToggled &&data.mods&& data.mods.map((row) => (
+                {!isToggled &&inputData.mods&& inputData.mods.map((row) => (
                   !row.type && (
                     <CSSTransition
                       key={row.mod}

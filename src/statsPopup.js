@@ -4,171 +4,187 @@ import './page.css';
 import Row from 'react-bootstrap/esm/Row';
 import Col from 'react-bootstrap/esm/Col';
 import axios from 'axios';
-import './statsPopup.css'
+import './statsPopup.css';
 import { Form, Dropdown, DropdownButton } from 'react-bootstrap';
+import { useUser } from '@clerk/clerk-react';
 
-const PopupWithStatInput = ({ trigger,onSub }) => {
-  const [inputData, setInputData] = useState({
-    year: '',
-    make: '',
-    customMake: '',
-    model: '',
-    customModel: '',
-    power: '',
-    torque: '',
-    drivetrain: '',
-    hashtags: ""
-  });
-  const hashtags = [
-    '#Manual',
-    '#Bagged',
-    '#Lifted',
-    '#Drift',
-    '#Offroad',
-    '#Static',
-    '#Slammed',
-    '#JDM',
-    '#Euro',
-    '#Muscle '
-];
-  const [years, setYears] = useState([]);
-  const [makes, setMakes] = useState([]);
-  const [models, setModels] = useState([]);
-  const [selectedSet, setSelectedSet] = useState(1); // State to track the selected button set
-  const [selectedHashtags, setSelectedHashtags] = useState([]);
-    const [isOpen, setIsOpen] = useState(false); // State for popup animation
+const PopupWithStatInput = ({ trigger, onSub, input }) => {
+    const [inputData, setInputData] = useState(input);
+    console.log("data in stats",input)
 
-
-  useEffect(() => {
-    if (inputData.year && inputData.year !== 'Other') {
-      fetchMakes(inputData.year);
-    } else {
-      setMakes([]);
-      setModels([]);
-    }
-  }, [inputData.year]);
-
-  useEffect(() => {
-    if (inputData.make && inputData.make !== 'Other') {
-      fetchModels(inputData.year, inputData.make);
-    } else {
-      setModels([]);
-    }
-  }, [inputData.make,inputData.year]);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-
-    setInputData((prevData) => {
-      if (name === 'year') {
-        return {
-          ...prevData,
-          year: value,
-          make: '',
-          customMake: '',
-          model: '',
-          customModel: '',
+    const hashtags = [
+        '#Manual',
+        '#Bagged',
+        '#Lifted',
+        '#Drift',
+        '#Offroad',
+        '#Static',
+        '#Slammed',
+        '#JDM',
+        '#Euro',
+        '#Muscle'
+    ];
+    const [years, setYears] = useState([]);
+    const [makes, setMakes] = useState([]);
+    const [models, setModels] = useState([]);
+    const [selectedHashtags, setSelectedHashtags] = useState([]);
+    const [isLoading, setIsLoading] = useState(true); // Loading state
+    const { user, isLoaded, isSignedIn } = useUser();
+    useEffect(() => {
+        const fetchData = async () => {
+            await fetchYears(); // Fetch years on component mount
+            setIsLoading(false); // Set loading to false once data is fetched
         };
-      }
+        fetchData();
+    }, []);
 
-      if (name === 'make') {
-        return {
-          ...prevData,
-          make: value,
-          customMake: '',
-          model: '',
-          customModel: '',
+    useEffect(() => {
+        if (inputData.year && inputData.year !== 'Other'  && isLoaded) {
+            fetchMakes(inputData.year);
+        } else {
+            console.log("showing no makes and models")
+            setMakes([]);
+            setModels([]);
+        }
+    }, [inputData.year]);
+
+    useEffect(() => {
+        if (inputData.make && inputData.make !== 'Other' && isLoaded ) {
+            fetchModels(inputData.year, inputData.make);
+        } else {
+            console.log("showing no makes and models")
+            setModels([]);
+        }
+    }, [inputData.make, inputData.year]);
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+
+        setInputData((prevData) => {
+            if (name === 'year') {
+                return {
+                    ...prevData,
+                    year: value,
+                    make: '',
+                    customMake: '',
+                    model: '',
+                    customModel: '',
+                };
+            }
+
+            if (name === 'make') {
+                return {
+                    ...prevData,
+                    make: value,
+                    customMake: '',
+                    model: '',
+                    customModel: '',
+                };
+            }
+
+            return {
+                ...prevData,
+                [name]: value,
+            };
+        });
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        const submittedData = {
+            ...inputData,
+            model: inputData.model === 'Other' ? inputData.customModel : inputData.model,
+            make: inputData.make === 'Other' ? inputData.customMake : inputData.make,
+            hashtags: selectedHashtags.join(' ')
         };
-      }
 
-      return {
-        ...prevData,
-        [name]: value,
-      };
-    });
-  };
+        console.log('Submitted Data:', submittedData);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if(inputData.model === "Other"){
-        inputData.model = inputData.customModel;
-    }
-    if(inputData.make === "Other"){
-        inputData.make = inputData.customMake;
-    }
-    delete inputData.customMake;
-    delete inputData.customModel;
-    console.log('Submitted Data:', inputData);
-    inputData.hashtags = selectedHashtags.join(' ');
+        if (onSub) {
+            onSub(submittedData);
+        }
+    };
 
-    if (onSub) {
-        onSub(inputData);
-      }
-  };
+    const fetchYears = async () => {
+        try {
+            const response = await axios.get(
+                `https://public.opendatasoft.com/api/records/1.0/search/?dataset=all-vehicles-model&q=&facet=year`
+            );
 
-  const fetchYears = async () => {
-    try {
-      const response = await axios.get(
-        `https://public.opendatasoft.com/api/records/1.0/search/?dataset=all-vehicles-model&q=&facet=year`
-      );
-  
-      const yearsList = response.data.facet_groups[0]?.facets.map((facet) => parseInt(facet.name)) || [];
-      const sortedYears = yearsList.sort((a, b) => b - a);
-      const lastYear = sortedYears.length > 0 ? sortedYears[sortedYears.length - 1] : new Date().getFullYear();
-      const additionalYears = [];
-      for (let year = lastYear - 1; year >= 1900; year--) {
-        additionalYears.push(year);
-      }
-      const finalYearsList = [...sortedYears, ...additionalYears];
-  
-      setYears(finalYearsList);
-    } catch (error) {
-      console.error('Error fetching years:', error);
-    }
-  };
-  
-  fetchYears();
-  const fetchMakes = async (year) => {
-    try {
-      const response = await axios.get(
-        `https://public.opendatasoft.com/api/records/1.0/search/?dataset=all-vehicles-model&q=&facet=make&refine.year=${year}`
-      );
-  
-      if (response.data.facet_groups && response.data.facet_groups.length > 0) {
-        const makesList = response.data.facet_groups[0]?.facets.map((facet) => facet.name) || [];
-        setMakes(makesList.sort());
-      } else {
-        console.warn('No makes found for the selected year.');
-        setMakes([]);
-      }
-    } catch (error) {
-      console.error('Error fetching makes:', error);
-    }
-  };
-  
-  const fetchModels = async (year, make) => {
-    try {
-      const response = await axios.get(
-        `https://public.opendatasoft.com/api/records/1.0/search/?dataset=all-vehicles-model&q=&facet=model&refine.year=${year}&refine.make=${make}`
-      );
-  
-      if (response.data.facet_groups && response.data.facet_groups.length > 0) {
-        const modelsList = response.data.facet_groups[0]?.facets.map((facet) => facet.name) || [];
-        setModels(modelsList.sort());
-      } else {
-        console.warn('No models found for the selected make and year.');
-        setModels([]);
-      }
-    } catch (error) {
-      console.error('Error fetching models:', error);
-    }
-  };
-  
+            const yearsList = response.data.facet_groups[0]?.facets.map((facet) => parseInt(facet.name)) || [];
+            const sortedYears = yearsList.sort((a, b) => b - a);
+            const lastYear = sortedYears.length > 0 ? sortedYears[sortedYears.length - 1] : new Date().getFullYear();
+            const additionalYears = [];
+            for (let year = lastYear - 1; year >= 1900; year--) {
+                additionalYears.push(year);
+            }
+            const finalYearsList = [...sortedYears, ...additionalYears];
 
-  // Handle button selection and deselection logic
-  const handleButtonClick = (setIndex) => {
-    // Update the selected set (button clicked)
-    setSelectedSet(setIndex);
+            setYears(finalYearsList);
+        } catch (error) {
+            console.error('Error fetching years:', error);
+        }
+    };
+
+    const fetchMakes = async (year) => {
+        try {
+            const response = await axios.get(
+                `https://public.opendatasoft.com/api/records/1.0/search/?dataset=all-vehicles-model&q=&facet=make&refine.year=${year}`
+            );
+
+            if (response.data.facet_groups && response.data.facet_groups.length > 0) {
+                const makesList = response.data.facet_groups[0]?.facets.map((facet) => facet.name) || [];
+                setMakes(makesList.sort());
+            } else {
+                console.warn('No makes found for the selected year.');
+                setMakes([]);
+            }
+        } catch (error) {
+            console.error('Error fetching makes:', error);
+        }
+    };
+
+    const fetchModels = async (year, make) => {
+        try {
+            const response = await axios.get(
+                `https://public.opendatasoft.com/api/records/1.0/search/?dataset=all-vehicles-model&q=&facet=model&refine.year=${year}&refine.make=${make}`
+            );
+
+            if (response.data.facet_groups && response.data.facet_groups.length > 0) {
+                const modelsList = response.data.facet_groups[0]?.facets.map((facet) => facet.name) || [];
+                setModels(modelsList.sort());
+            } else {
+                console.warn('No models found for the selected make and year.');
+                setModels([]);
+            }
+        } catch (error) {
+            console.error('Error fetching models:', error);
+        }
+    };
+
+
+    const colorIndexMap = {
+        'lightcoral': 1,
+        'khaki': 2,
+        'lightblue': 3,
+        'lightgreen': 4,
+        'lightsalmon': 5,
+        'mistyrose': 6, 
+        'mediumpurple': 7,
+        'rgba(78, 78, 78, 0.73)': 8,
+        'sandybrown': 9
+    };
+    
+    const getColorIndex = (color) => {
+        return colorIndexMap[color] || 1; // Return the ID or null if not found
+    };
+    const [selectedSet, setSelectedSet] = useState(getColorIndex(inputData.mainColor));
+
+
+    // Handle button selection and deselection logic
+    const handleButtonClick = (setIndex) => {
+        setSelectedSet(setIndex);
   
     // Update the inputData with corresponding lightColor, mainColor, and darkColor values
     setInputData((prevData) => {
@@ -238,7 +254,6 @@ const PopupWithStatInput = ({ trigger,onSub }) => {
   
   // Define a function to apply button styles dynamically based on selection
   const getButtonStyle = (setIndex, id=0) => {
-    
     // Base style for selected or non-selected buttons
     const baseStyle = selectedSet === setIndex
       ? { opacity: 1, borderTop: '2px solid black', borderBottom: '2px solid black' }  // Selected button style (highlighted)

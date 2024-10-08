@@ -18,15 +18,32 @@ const UserCarEdit = () => {
   const { user, isLoaded, isSignedIn } = useUser();
   const navigate = useNavigate();
   
-  const [inputData, setData] = useState(null);
+  const def = {
+    year: "1995",
+    make: "Mazda", 
+    model: "MX-5 Miata",
+    power: "0",
+    torque: "0",
+    drivetrain: "RWD",
+    hashtags: "#hashtag",
+    lightColor: "bisque",
+    mainColor: "lightsalmon",
+    darkColor: "darksalmon",
+    mods: []
+};
+
+  const [inputData, setData] = useState(def);
+
   const [isToggled, setIsToggled] = useState(false);
   const [responseMessage, setResponseMessage] = useState('');
   const [error, setError] = useState('');
   const [re, needRe] = useState(false);
+  const [tryedFetch, setTryedFetch] = useState(false);
 
-  const key = user?.username || '';
-  useFetchProfileData(key, isLoaded, isSignedIn, setData, setError, navigate);
 
+  let key;
+  useFetchProfileData( key, isSignedIn, tryedFetch, setTryedFetch, inputData, setData, setError, navigate)
+    console.log("data is ", inputData)
   useEffect(() => {
     if (inputData) {
       document.documentElement.style.setProperty('--mainColor', inputData.mainColor);
@@ -34,30 +51,48 @@ const UserCarEdit = () => {
   }, [inputData]);
 
   useEffect(() => {
-    if (re) {
+    if (re && inputData) {
+      console.log("re handle")
       handleUpdate();
       needRe(false);
     }
-  }, [needRe, re]);
+  }, [re]);
 
-  useEffect(() => {
-    if (!inputData || error) {
-      const def = {
-        year: "Year",
-        make: "Make",
-        model: "Model",
-        power: "0",
-        torque: "0",
-        drivetrain: "RWD",
-        hashtags: "#hashtag",
-        lightColor: "bisque",
-        mainColor: "lightsalmon",
-        darkColor: "darksalmon",
-        mods: []
-      };
-      setData(def);
-    }
-  }, [inputData, error]);
+  // useEffect(() => {
+  //   console.log("params", !inputData, isLoaded, tryedFetch);
+
+  //   // Check if we should set default data after trying to fetch
+  //   if (!inputData && isLoaded && tryedFetch) {
+  //       const setDefaultData = async () => {
+  //           const def = {
+  //               year: "1995",
+  //               make: "Mazda", 
+  //               model: "MX-5 Miata",
+  //               power: "0",
+  //               torque: "0",
+  //               drivetrain: "RWD",
+  //               hashtags: "#hashtag",
+  //               lightColor: "bisque",
+  //               mainColor: "lightsalmon",
+  //               darkColor: "darksalmon",
+  //               mods: []
+  //           };
+
+  //           // Set default data if no inputData is available after fetching
+  //           await setData(def);
+  //           console.log("Default data set", def);
+
+  //           // Trigger handleUpdate if needed after setting the default data
+  //           setTimeout(handleUpdate, 1000);
+  //       };
+
+  //       setDefaultData();
+  //   }
+
+// }, [inputData, isLoaded, tryedFetch, key, isSignedIn, setError, navigate]);
+
+
+
 
   if (!isLoaded) {
     return <div>Loading...</div>;
@@ -67,16 +102,15 @@ const UserCarEdit = () => {
     navigate('/');
     return null;
   }
-
   if (user.username !== username) {
-    navigate(`/${username}/edit`);
+    navigate(`/${user.username}/edit`);
     return null;
   }
 
   const handleUpdate = async () => {
     console.log("handleUpdate");
     if (!inputData) {
-      console.error("Input data is null, cannot update.");
+      console.error("Input data is null, cannot update.",inputData);
       return;
     }
 
@@ -124,7 +158,7 @@ const UserCarEdit = () => {
     needRe(true);
   };
 
-  // New function to handle deletion of mods
+  // Function to handle deletion of mods
   const handleDeleteMod = (modToDelete) => {
     setData((prevData) => {
       const updatedMods = prevData.mods.filter(mod => mod.mod !== modToDelete.mod);
@@ -134,6 +168,23 @@ const UserCarEdit = () => {
       };
     });
     needRe(true); // Call handleUpdate after deletion
+  };
+
+  // Function to handle editing of mods
+  const handleEditMod = (modToEdit) => {
+    const newDetails = prompt("Edit mod details:", modToEdit.details);
+    if (newDetails !== null && newDetails !== modToEdit.details) {
+      setData((prevData) => {
+        const updatedMods = prevData.mods.map(mod => 
+          mod.mod === modToEdit.mod ? { ...mod, details: newDetails } : mod
+        );
+        return {
+          ...prevData,
+          mods: updatedMods
+        };
+      });
+      needRe(true); // Call handleUpdate after edit
+    }
   };
 
   const handleToggle = () => {
@@ -186,7 +237,7 @@ const UserCarEdit = () => {
                 </Col>
               </Row>
 
-              <PopupWithStatInput
+              {inputData&&<PopupWithStatInput
                 trigger={
                   <button
                     className="bubble-overlay"
@@ -209,7 +260,8 @@ const UserCarEdit = () => {
                 }
                 modal
                 onSub={handleDataSubmit}
-              />
+                input={inputData}
+              />}
             </div>
 
             <div className="toggle-container" style={{ padding: '20px 0' }}>
@@ -242,7 +294,14 @@ const UserCarEdit = () => {
                             &#x2716; {/* X icon for delete */}
                           </button>
                         </div>
-                        <span className='mod-descrip'> {row.details}</span>
+                        <div className='mod-descrip'> {row.details}
+                        <button 
+                            onClick={() => handleEditMod(row)} // Add edit functionality
+                            style={{ marginLeft: '10px', background: 'transparent', border: 'none', color: 'blue', cursor: 'pointer' }}
+                          >
+                            &#9998; {/* Pencil icon for edit */}
+                          </button>
+                          </div>
                       </Row>
                     </CSSTransition>
                   )
@@ -264,7 +323,14 @@ const UserCarEdit = () => {
                             &#x2716; {/* X icon for delete */}
                           </button>
                         </div>
-                        <span className='mod-descrip'> {row.details}</span>
+                        <div className='mod-descrip'> {row.details}
+                        <button 
+                            onClick={() => handleEditMod(row)} // Add edit functionality
+                            style={{ marginLeft: '10px', background: 'transparent', border: 'none', color: 'blue', cursor: 'pointer' }}
+                          >
+                            &#9998; {/* Pencil icon for edit */}
+                          </button>
+                          </div>
                       </Row>
                     </CSSTransition>
                   )
