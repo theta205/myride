@@ -1,72 +1,153 @@
 import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
 import './page.css';
 import Image from 'react-bootstrap/Image';
 import Container from 'react-bootstrap/Container';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { CSSTransition, TransitionGroup } from 'react-transition-group'; // Import transitions
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import SettingsDropdown from './SettingsDropdown';
 import PopupWithStatInput from './statsPopup';
 import PopupForMods from './modPopup';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { Cloudinary } from '@cloudinary/url-gen';
+import { auto } from '@cloudinary/url-gen/actions/resize';
+import { autoGravity } from '@cloudinary/url-gen/qualifiers/gravity';
+import { AdvancedImage } from '@cloudinary/react';
 
-function Test() {
-  const { isLoaded } = useUser();
+const Test = () => {
 
-  const initialData = {
-    year: "2013",
-    make: "Hyundai",
-    model: "Genesis Coupe",
-    power: "276",
-    torque: "250",
+    const cld = new Cloudinary({ cloud: { cloudName: 'duv7zmdkz' } });
+  
+  // Use this sample image or upload your own via the Media Explorer
+//   const img = cld
+//         .image('cld-sample-5')
+//         .format('auto') // Optimize delivery by resizing and applying auto-format and auto-quality
+//         .quality('auto')
+//         .resize(auto().gravity(autoGravity()).width(500).height(500)); // Transform the image: auto-crop to square aspect_ratio
+
+//   return (<AdvancedImage cldImg={img}/>);
+
+  
+  const { username } = useParams();
+  const { user, isLoaded, isSignedIn } = useUser();
+  const navigate = useNavigate();
+  
+  const def = {
+    year: "1995",
+    make: "Mazda", 
+    model: "MX-5 Miata",
+    power: "0",
+    torque: "0",
     drivetrain: "RWD",
-    hashtags: "#KDM #Lit",
-    lightColor: 'mistyrose',
-    mainColor: 'lightcoral',
-    darkColor: 'indianred'
-  };
+    hashtags: "#hashtag",
+    lightColor: "bisque",
+    mainColor: "lightsalmon",
+    darkColor: "darksalmon",
+    mods: []
+};
 
-  const rowsData = [];
+  const [inputData, setData] = useState(def);
 
-  const [inputData, setData] = useState(initialData);
-  const [inputMod, setMod] = useState(rowsData);
   const [isToggled, setIsToggled] = useState(false);
+  const [responseMessage, setResponseMessage] = useState('');
+  const [error, setError] = useState('');
+  const [re, needRe] = useState(false);
+  const [tryedFetch, setTryedFetch] = useState(false);
 
-  const handleDataSubmit = (submittedData) => {
-    setData(submittedData);
-    console.log(submittedData);
-  };
-
-  const handleDataSubmitTwo = (submittedData) => {
-    setMod(submittedData);
-    console.log(submittedData);
-  };
 
   useEffect(() => {
-    setData(initialData);
-  }, []);
-
-  useEffect(() => {
-    document.documentElement.style.setProperty('--mainColor', inputData.mainColor);
+    if (inputData) {
+      document.documentElement.style.setProperty('--mainColor', inputData.mainColor);
+    }
   }, [inputData]);
 
-  const handleToggle = () => {
-    setIsToggled(prevState => !prevState);
-  };
+  useEffect(() => {
+    if (re && inputData) {
+      console.log("re handle")
+      handleUpdate();
+      needRe(false);
+    }
+  }, [re]);
+
+
+
 
   if (!isLoaded) {
     return <div>Loading...</div>;
   }
 
+  const handleUpdate = async () => {
+    console.log("handleUpdate");
+    if (!inputData) {
+      console.error("Input data is null, cannot update.",inputData);
+      return;
+    }
+  };
+
+  const handleDataSubmit = (submittedData) => {
+    console.log("1")
+    setData((prevData) => ({
+      ...prevData,
+      ...submittedData
+    }));
+    needRe(true);
+  };
+
+  const handleDataSubmitTwo = (submittedData) => {
+    console.log("2");
+    setData((prevData) => {
+      const mergedMods = [...(prevData?.mods || []), ...(submittedData?.mods || [])];
+      return {
+        ...prevData,
+        mods: mergedMods,
+      };
+    });
+    needRe(true);
+  };
+
+  // Function to handle deletion of mods
+  const handleDeleteMod = (modToDelete) => {
+    setData((prevData) => {
+      const updatedMods = prevData.mods.filter(mod => mod.mod !== modToDelete.mod);
+      return {
+        ...prevData,
+        mods: updatedMods
+      };
+    });
+    needRe(true); // Call handleUpdate after deletion
+  };
+
+  // Function to handle editing of mods
+  const handleEditMod = (modToEdit) => {
+    const newDetails = prompt("Edit mod details:", modToEdit.details);
+    if (newDetails !== null && newDetails !== modToEdit.details) {
+      setData((prevData) => {
+        const updatedMods = prevData.mods.map(mod => 
+          mod.mod === modToEdit.mod ? { ...mod, details: newDetails } : mod
+        );
+        return {
+          ...prevData,
+          mods: updatedMods
+        };
+      });
+      needRe(true); // Call handleUpdate after edit
+    }
+  };
+
+  const handleToggle = () => {
+    setIsToggled((prevState) => !prevState);
+  };
+
+  const { year, make, model, power, torque, drivetrain, hashtags, lightColor, mainColor, darkColor, mods = [] } = inputData || {};
+
   return (
     <Container className="d-flex justify-content-center vh-100">
       <Row>
-        <Col></Col>
         <Col>
-          <div className="bg" style={{ height: "1000px", background: inputData.lightColor }}>
-            <div className="stats-lander" style={{ position: 'relative', background: inputData.mainColor }}>
-              {/* Car Image */}
+          <div className="bg" style={{ height: "1000px", background: lightColor }}>
+            <div className="stats-lander" style={{ position: 'relative', background: mainColor }}>
               <Image
                 src="/images/miata.png"
                 className="img-fluid"
@@ -77,37 +158,35 @@ function Test() {
                   borderBottomRightRadius: "0px",
                 }}
               />
-
-              {/* Settings Dropdown */}
               <div className="settings-overlay">
                 <SettingsDropdown className="settings-drop" />
               </div>
 
               <div style={{ textAlign: 'center' }}>
-                <h1 className="car-label">{inputData.year} {inputData.make} {inputData.model}</h1>
+                <h1 className="car-label">{year} {make} {model}</h1>
               </div>
 
-              <div className="stats-oval" style={{ position: 'relative', background: inputData.darkColor }}>
+              <div className="stats-oval" style={{ position: 'relative', background: darkColor }}>
                 <Row xs="auto" className="justify-content-center">
                   <Col>
-                    <span className="stats-label">{inputData.power} hp</span>
+                    <span className="stats-label">{power} hp</span>
                   </Col>
                   <Col>
-                    <span className="stats-label">{inputData.torque} ft/lbs</span>
+                    <span className="stats-label">{torque} ft/lbs</span>
                   </Col>
                   <Col>
-                    <span className="stats-label">{inputData.drivetrain}</span>
+                    <span className="stats-label">{drivetrain}</span>
                   </Col>
                 </Row>
               </div>
 
               <Row xs={1} className="centered-div justify-content-center" style={{ margin: '0 30px' }}>
                 <Col>
-                  <span className="hashtag-label">{inputData.hashtags}</span>
+                  <span className="hashtag-label">{hashtags}</span>
                 </Col>
               </Row>
 
-              <PopupWithStatInput
+              {inputData&&<PopupWithStatInput
                 trigger={
                   <button
                     className="bubble-overlay"
@@ -124,17 +203,18 @@ function Test() {
                       border: 'transparent',
                       cursor: 'pointer',
                       zIndex: 1,
+                      display: 'flex'
                     }}
                   ></button>
                 }
                 modal
                 onSub={handleDataSubmit}
-              />
+                input={inputData}
+              />}
             </div>
 
-            {/* Toggle Switch */}
             <div className="toggle-container" style={{ padding: '20px 0' }}>
-              <label className="toggle-button">
+              <label className="toggle-button" type='button'>
                 <input type="checkbox" onChange={handleToggle} />
                 <span className="slider">
                   <span className="toggle-label off">Cosmetics</span>
@@ -146,22 +226,36 @@ function Test() {
             {/* Mod List */}
             <Col style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
               <TransitionGroup>
-                {isToggled && inputMod.map((row) => (
+                {isToggled && mods.map((row) => (
                   row.type && (
                     <CSSTransition
                       key={row.mod}
                       timeout={500}
-                      classNames="mod-fade" // CSS class for the animation
+                      classNames="mod-fade"
                     >
                       <Row className='mod'>
-                        <div className='mod-head' style={{ marginTop: '-5px' }}>{row.mod}</div>
-                        <text className='mod-descrip'> {row.details}</text>
+                        <div className='mod-head' style={{ marginTop: '-5px' }}>
+                          {row.mod}
+                          <button 
+                            onClick={() => handleDeleteMod(row)} // Add delete functionality
+                            style={{ marginLeft: '10px', background: 'transparent', border: 'none', color: 'red', cursor: 'pointer' }}
+                          >
+                            &#x2716; {/* X icon for delete */}
+                          </button>
+                        </div>
+                        <div className='mod-descrip'> {row.details}
+                        <button 
+                            onClick={() => handleEditMod(row)} // Add edit functionality
+                            style={{ marginLeft: '10px', background: 'transparent', border: 'none', color: 'blue', cursor: 'pointer' }}
+                          >
+                            &#9998; {/* Pencil icon for edit */}
+                          </button>
+                          </div>
                       </Row>
-                      
                     </CSSTransition>
                   )
                 ))}
-                {!isToggled && inputMod.map((row) => (
+                {!isToggled && mods.map((row) => (
                   !row.type && (
                     <CSSTransition
                       key={row.mod}
@@ -169,8 +263,23 @@ function Test() {
                       classNames="mod-fade"
                     >
                       <Row className='mod'>
-                        <div className='mod-head' style={{ marginTop: '-5px' }}>{row.mod}</div>
-                        <text className='mod-descrip'> {row.details}</text>
+                        <div className='mod-head' style={{ marginTop: '-5px' }}>
+                          {row.mod}
+                          <button 
+                            onClick={() => handleDeleteMod(row)} // Add delete functionality
+                            style={{ marginLeft: '10px', background: 'transparent', border: 'none', color: 'red', cursor: 'pointer' }}
+                          >
+                            &#x2716; {/* X icon for delete */}
+                          </button>
+                        </div>
+                        <div className='mod-descrip'> {row.details}
+                        <button 
+                            onClick={() => handleEditMod(row)} // Add edit functionality
+                            style={{ marginLeft: '10px', background: 'transparent', border: 'none', color: 'blue', cursor: 'pointer' }}
+                          >
+                            &#9998; {/* Pencil icon for edit */}
+                          </button>
+                          </div>
                       </Row>
                     </CSSTransition>
                   )
@@ -198,6 +307,6 @@ function Test() {
       </Row>
     </Container>
   );
-}
+};
 
 export default Test;

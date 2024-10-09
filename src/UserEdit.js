@@ -17,6 +17,7 @@ const UserCarEdit = () => {
   const { username } = useParams();
   const { user, isLoaded, isSignedIn } = useUser();
   const navigate = useNavigate();
+  const [image, setImage] = useState("/images/miata.png")
   
   const def = {
     year: "1995",
@@ -137,8 +138,9 @@ const UserCarEdit = () => {
     }
   };
 
-  const handleDataSubmit = (submittedData) => {
+  const handleDataSubmit = (submittedData, headImage) => {
     console.log("1")
+    setImage(headImage)
     setData((prevData) => ({
       ...prevData,
       ...submittedData
@@ -200,7 +202,7 @@ const UserCarEdit = () => {
           <div className="bg" style={{ height: "1000px", background: lightColor }}>
             <div className="stats-lander" style={{ position: 'relative', background: mainColor }}>
               <Image
-                src="/images/miata.png"
+                src={image}
                 className="img-fluid"
                 style={{
                   width: "auto",

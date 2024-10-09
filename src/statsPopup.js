@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef,useEffect } from 'react';
 import Popup from 'reactjs-popup';
 import './page.css';
 import Row from 'react-bootstrap/esm/Row';
@@ -7,11 +7,17 @@ import axios from 'axios';
 import './statsPopup.css';
 import { Form, Dropdown, DropdownButton } from 'react-bootstrap';
 import { useUser } from '@clerk/clerk-react';
+import { Cloudinary } from '@cloudinary/url-gen';
+import { auto } from '@cloudinary/url-gen/actions/resize';
+import { autoGravity } from '@cloudinary/url-gen/qualifiers/gravity';
+import { AdvancedImage } from '@cloudinary/react';
+import ReactCrop from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
+import { makeAspectCrop } from 'react-image-crop';
+import { heic } from '@cloudinary/url-gen/qualifiers/format';
 
 const PopupWithStatInput = ({ trigger, onSub, input }) => {
     const [inputData, setInputData] = useState(input);
-    console.log("data in stats",input)
-
     const hashtags = [
         '#Manual',
         '#Bagged',
@@ -30,6 +36,20 @@ const PopupWithStatInput = ({ trigger, onSub, input }) => {
     const [selectedHashtags, setSelectedHashtags] = useState([]);
     const [isLoading, setIsLoading] = useState(true); // Loading state
     const { user, isLoaded, isSignedIn } = useUser();
+    const [imageSelected, setImageSelected] = useState(null);
+    const [imageUrl, setImageUrl] = useState("");
+    const[resized, setResize] = useState(false)
+    const [image, setImage] = useState(null); // For the uploaded image
+    const [croppedImage, setCroppedImage] = useState(null); // Cropped image 
+    const [croppedImageSend, setCroppedImageSend] = useState(null); // Cropped image
+    const [imageRef, setImageRef] = useState(null); // Image reference for cropping
+    const [nh,setNH]= useState(1)
+    const [nw,setNW]= useState(1)
+    const [aspect,setAspect]= useState(null)
+
+
+
+
     useEffect(() => {
         const fetchData = async () => {
             await fetchYears(); // Fetch years on component mount
@@ -91,7 +111,6 @@ const PopupWithStatInput = ({ trigger, onSub, input }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
         const submittedData = {
             ...inputData,
             model: inputData.model === 'Other' ? inputData.customModel : inputData.model,
@@ -102,7 +121,9 @@ const PopupWithStatInput = ({ trigger, onSub, input }) => {
         console.log('Submitted Data:', submittedData);
 
         if (onSub) {
-            onSub(submittedData);
+            onSub(submittedData, croppedImageSend);
+            console.log("just subbed " ,croppedImage)
+
         }
     };
 
@@ -284,15 +305,221 @@ const PopupWithStatInput = ({ trigger, onSub, input }) => {
         setSelectedHashtags([...selectedHashtags, eventKey]);
     }
 };
+
+const onImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith('image/')) { // Ensure the file is an image
+        const reader = new FileReader();
+        reader.onload = () => {
+            setImage(reader.result);
+            const img = new Image();
+            
+            img.src = reader.result;
+            img.onload = () => {
+                console.log("in on load")
+                setImageRef(img); // Set the image object for cropping
+            };
+        };
+        reader.readAsDataURL(file);
+    } else {
+        alert('Please upload a valid image file.');
+    }
+};
+
+const onImageLoaded = (img) => {
+    console.log('Image loaded:', img);
+    setImageRef(img); // Reference to the image for cropping
+    console.log('Image loaded:', imageRef);
+
+};
+
+const onCropComplete = (crop) => {
+    if (crop.width > 0 && crop.height > 0) {
+        cropImage(crop);
+        console.log("cropped:", crop);
+    } else {
+        console.error("Invalid crop dimensions:", crop);
+    }
+};
+const imgRef = useRef(null);
+const getNatural = () => {
+    const displayedWidth = imgRef.current.clientWidth;
+    const displayedHeight = imgRef.current.clientHeight;
+    setNH(imgRef.current.clientHeight)
+    setNW(imgRef.current.clientWidth)
+
+    console.log(`Displayed Width: ${displayedWidth}px`);
+    console.log(`Displayed Height: ${displayedHeight}px`);
+}
+const cropImage = (crop) => {
+    if (!imageRef) {
+        console.error("Image reference is not set");
+        return;
+    }
+
+    console.log("Image:", imageRef);
+    console.log("nhere",nw)
+    console.log("Crop dimensions:", crop.width, crop.height);
+    
+    if (image && nw<400){
+        console.log("in if")
+
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const scale = 400/nw
+        // Set the canvas dimensions to the desired resolution
+        // For example, double the original dimensions
+        const newWidth = nw * scale;
+        const newHeight = nh * scale;
+
+        canvas.width = newWidth;
+        canvas.height = newHeight;
+        console.log("new",newWidth, newHeight)
+        console.log("imageHere",image)
+        // Draw the image onto the canvas, scaling it to the new dimensions
+        ctx.drawImage(image, 0, 0, nw, nh,0 , 0, newWidth, newHeight)
+
+
+        // Convert the canvas back to an image (if needed)
+        const newImageUrl = canvas.toDataURL(); // This creates a base64-encoded version of the image
+        setImage(newImageUrl)
+    }
+    if (crop.width > 0 && crop.height > 0) {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Ensure image is fully loaded
+        const naturalWidth = imageRef.naturalWidth;
+        const naturalHeight = imageRef.naturalHeight;
+
+    
+
+        // Calculate scale factors
+        const scaleX = (naturalWidth / nw);
+        const scaleY = (naturalHeight / nh);
+        if(((scaleX*crop.width)<400)||(1.25*crop.height>crop.width)){
+            if ((scaleX*crop.width)<400){
+                crop.width=401/scaleX
+                setResize(true)
+            }
+            if(1.25*crop.height>crop.width){
+                setResize(true)
+                crop.height =  crop.width/1.25
+            }
+        }else {
+            setResize(false)
+        }
+        // Calculate new width and height based on crop and scale
+        const w = crop.width * scaleX; // New width
+        const h = crop.height * scaleY; // New height
+
+        // Set canvas size to the new dimensions
+        canvas.width = w; // Set to new width
+        canvas.height = h; // Set to new height
+
+        console.log("nat:", naturalWidth, naturalHeight);
+        console.log("scales:", scaleX, scaleY);
+        console.log("new w and h", nw, nh);
+
+        // Draw the image on the canvas
+        ctx.drawImage(
+            imageRef,
+            crop.x * scaleX,
+            crop.y * scaleY,
+            w, // Use new width here
+            h, // Use new height here
+            0,
+            0,
+            w, // Destination width
+            h  // Destination height
+        );
+
+        // Get the cropped image as base64
+        const base64Image = canvas.toDataURL('image/jpeg');
+        setCroppedImageSend(base64Image);
+        setCroppedImage(base64Image); // Set the cropped image
+
+    } else {
+        console.error("Invalid crop dimensions");
+    }
+};
+
+
   
   
+const [crop, setCrop] = useState({ 
+    unit: 'px',  // Unit can be 'px' or '%'
+    height: 100, 
+    width: 150, // Default crop height
+    x: 0,        // Default x position of the crop
+    y: 0         // Default y position of the crop
+    },
+    );
+
 
   
   return (
-    <div style={{height:"auto", display: 'flex'}}>
-      <Popup trigger={trigger} className="popup-content"  position="bottom center" closeOnEscape closeOnDocumentClick style={{justifyContent: 'center', height:"auto", color : "white", transition: 'opacity 0.3s ease, transform 0.3s ease' }}>
-          <form onSubmit={handleSubmit} style={{justifyContent: 'center', height:"auto"}}>
-            <Col style={{justifyContent:'center'}}>          <h3>Enter Your Cars Info</h3>
+    <div style={{ height: "auto", display: 'flex' }}>
+            <Popup trigger={trigger} className="popup-content" position="bottom center" closeOnEscape closeOnDocumentClick>
+                <form onSubmit={handleSubmit} style={{ justifyContent: 'center', height: "auto" }}>
+                    <Col style={{ justifyContent: 'center' }}>
+                        <h3>Enter Your Car's Info</h3>
+                        <Row>
+                            <label htmlFor="imageUpload">Upload Image:</label>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={onImageUpload}
+                                required
+                                style={{ marginBottom: '10px' }}
+                            />
+                        </Row>
+                        {image && (
+                            <Row>
+                                <h4>Uploaded Image:</h4>
+                                
+                            </Row>
+                        )}
+                        {image && (
+                            <>
+                                <ReactCrop
+                                    crop={crop}
+                                    onComplete={onCropComplete}
+                                    // maxHeight={300}
+                                    // maxWidth={400}
+                                     minHeight={50}
+                                     minWidth={50}
+                                     maxHeight={400}
+                                     maxWidth={400}
+                                     aspect={aspect}
+                                     keepSelection={true}
+                                    onChange={(newCrop) => {
+                                        setCrop(newCrop);
+                                    }
+                                   
+                                    }
+                                    >
+                                    <img src={image}  ref={imgRef} onLoad={getNatural} alt="Uploaded Car" style={{width: '100%', height: '100%' }} />
+                                </ReactCrop>
+                               { resized && croppedImage&& <text>Image has been resized. The max aspect ratio is 1.25 </text>}
+                                {croppedImage && 
+                                   
+                                (
+                                  // <div style={{ width: '380px', height: '300px', overflow: 'hidden' }}> 
+                                  
+                                   <img 
+                                       src={croppedImage} 
+                                       alt="Cropped Image" 
+                                       style={{ marginTop: '10px', width: 'auto', height:'auto',maxWidth: '100%', maxHeight: '100%', display: 'block' }} 
+                                   />
+                             //  </div>
+                                )}
+                            </>
+                        )}
+
+
+
+
             <Row><label htmlFor="year">Year:</label></Row>
                 <Row className='stats-rows'>
                     <Form.Select
