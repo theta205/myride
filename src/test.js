@@ -16,6 +16,7 @@ import { auto } from '@cloudinary/url-gen/actions/resize';
 import { autoGravity } from '@cloudinary/url-gen/qualifiers/gravity';
 import { AdvancedImage } from '@cloudinary/react';
 
+
 const Test = () => {
 
     const cld = new Cloudinary({ cloud: { cloudName: 'duv7zmdkz' } });
@@ -33,6 +34,9 @@ const Test = () => {
   const { username } = useParams();
   const { user, isLoaded, isSignedIn } = useUser();
   const navigate = useNavigate();
+  const [imagefile, setImageFile] = useState(null)
+  const [image, setImage] = useState("/images/miata.png")
+
   
   const def = {
     year: "1995",
@@ -86,8 +90,12 @@ const Test = () => {
     }
   };
 
-  const handleDataSubmit = (submittedData) => {
+  const handleDataSubmit = (submittedData,image,file) => {
     console.log("1")
+    setImage(image)
+    console.log("filee  f", file)
+
+    setImageFile(file)
     setData((prevData) => ({
       ...prevData,
       ...submittedData
@@ -148,8 +156,8 @@ const Test = () => {
         <Col>
           <div className="bg" style={{ height: "1000px", background: lightColor }}>
             <div className="stats-lander" style={{ position: 'relative', background: mainColor }}>
-              <Image
-                src="/images/miata.png"
+              {imagefile && <Image
+                src={image}
                 className="img-fluid"
                 style={{
                   width: "auto",
@@ -157,7 +165,9 @@ const Test = () => {
                   borderBottomLeftRadius: "0px",
                   borderBottomRightRadius: "0px",
                 }}
-              />
+                
+              />}
+              {!imagefile && <div style={{height:'50px'}}></div>}
               <div className="settings-overlay">
                 <SettingsDropdown className="settings-drop" />
               </div>
@@ -210,6 +220,7 @@ const Test = () => {
                 modal
                 onSub={handleDataSubmit}
                 input={inputData}
+                imageFile={imagefile}
               />}
             </div>
 

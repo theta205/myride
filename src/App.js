@@ -32,7 +32,7 @@ function App() {
           <Route path="/signup" element={<Login />} />
           <Route path="/signin" element={<Login />} />
           <Route path="/404" element={<NotFound />} />
-          <Route path="/test" element={<Test />} />
+          <Route path="/test" element={<Test/>} />
           <Route path="/:username" element={<UserRoute />} /> {/* Dynamic route */}
           {/* <Route path="/api/profiles/:key" element={<Store />}> </Route> */}
           <Route 

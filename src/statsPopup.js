@@ -3,9 +3,10 @@ import Popup from 'reactjs-popup';
 import './page.css';
 import Row from 'react-bootstrap/esm/Row';
 import Col from 'react-bootstrap/esm/Col';
+import Button from 'react-bootstrap/esm/Button';
 import axios from 'axios';
 import './statsPopup.css';
-import { Form, Dropdown, DropdownButton } from 'react-bootstrap';
+import { Form, Dropdown, DropdownButton, ToggleButtonGroup } from 'react-bootstrap';
 import { useUser } from '@clerk/clerk-react';
 import { Cloudinary } from '@cloudinary/url-gen';
 import { auto } from '@cloudinary/url-gen/actions/resize';
@@ -16,8 +17,10 @@ import 'react-image-crop/dist/ReactCrop.css';
 import { makeAspectCrop } from 'react-image-crop';
 import { heic } from '@cloudinary/url-gen/qualifiers/format';
 
-const PopupWithStatInput = ({ trigger, onSub, input }) => {
+const PopupWithStatInput = ({ trigger, onSub, input, imageFile }) => {
+   // console.log(imageFile)
     const [inputData, setInputData] = useState(input);
+
     const hashtags = [
         '#Manual',
         '#Bagged',
@@ -46,7 +49,16 @@ const PopupWithStatInput = ({ trigger, onSub, input }) => {
     const [nh,setNH]= useState(1)
     const [nw,setNW]= useState(1)
     const [aspect,setAspect]= useState(null)
-
+    const [minWidth, setMinWidth] =useState(50)
+    const [imagefile, setFileImage] = useState(imageFile)
+    const [crop, setCrop] = useState({ 
+        unit: 'px',  // Unit can be 'px' or '%'
+        height: 100, 
+        width: 380,
+        x: 0,        // Default x position of the crop
+        y: 0         // Default y position of the crop
+        },
+        );
 
 
 
@@ -101,7 +113,6 @@ const PopupWithStatInput = ({ trigger, onSub, input }) => {
                     customModel: '',
                 };
             }
-
             return {
                 ...prevData,
                 [name]: value,
@@ -121,7 +132,8 @@ const PopupWithStatInput = ({ trigger, onSub, input }) => {
         console.log('Submitted Data:', submittedData);
 
         if (onSub) {
-            onSub(submittedData, croppedImageSend);
+            console.log("just sub file", imagefile)
+            onSub(submittedData, croppedImageSend, imagefile);
             console.log("just subbed " ,croppedImage)
 
         }
@@ -308,6 +320,9 @@ const PopupWithStatInput = ({ trigger, onSub, input }) => {
 
 const onImageUpload = (e) => {
     const file = e.target.files[0];
+    setCroppedImage(null)
+    setFileImage(file)
+    console.log("fike",file)
     if (file && file.type.startsWith('image/')) { // Ensure the file is an image
         const reader = new FileReader();
         reader.onload = () => {
@@ -317,13 +332,24 @@ const onImageUpload = (e) => {
             img.src = reader.result;
             img.onload = () => {
                 console.log("in on load")
-                setImageRef(img); // Set the image object for cropping
+                setImageRef(img); 
+                // const naturalWidth = imgRef.current.naturalWidth;
+                // setMinWidth((400/naturalWidth)*400)
+                setCrop({ 
+                    unit: '%',  // Unit can be 'px' or '%'
+                    height: 100,
+                    width: 100,
+                    x: 0,        // Default x position of the crop
+                    y: 0         // Default y position of the crop
+                    },
+                );
             };
         };
         reader.readAsDataURL(file);
     } else {
         alert('Please upload a valid image file.');
     }
+    ImageorNot();
 };
 
 const onImageLoaded = (img) => {
@@ -350,61 +376,62 @@ const getNatural = () => {
 
     console.log(`Displayed Width: ${displayedWidth}px`);
     console.log(`Displayed Height: ${displayedHeight}px`);
+        const naturalWidth = imgRef.current.naturalWidth;
+        const naturalHeight = imgRef.current.naturalHeight;
+        console.log("nnatural", naturalWidth,naturalHeight)
+        setMinWidth((400/naturalWidth)*400)
+        if (naturalWidth<400){
+            console.log("in if")
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const scale = 400/nw
+            // Set the canvas dimensions to the desired resolution
+            const newWidth = nw * scale;
+            const newHeight = nh * scale;
+
+            canvas.width = newWidth;
+            canvas.height = newHeight;
+            console.log("new",newWidth, newHeight)
+
+            try {ctx.drawImage(imgRef.current, 0, 0, naturalWidth,naturalHeight ,0 , 0, newWidth, newHeight)
+            }
+            catch (e){
+                console.error(e)
+            }
+            const base64Image2 = canvas.toDataURL('image/jpeg');
+            setImage(base64Image2);
+        }
+    
 }
-const cropImage = (crop) => {
-    if (!imageRef) {
+const  cropImage = (crop) => {
+    if (!imgRef) {
         console.error("Image reference is not set");
         return;
     }
 
-    console.log("Image:", imageRef);
+    console.log("Image:", imgRef);
     console.log("nhere",nw)
     console.log("Crop dimensions:", crop.width, crop.height);
-    
-    if (image && nw<400){
-        console.log("in if")
+    if (imageRef && (crop.width > 0 && crop.height > 0)) {
+        console.log("imageHere",imgRef)
 
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        const scale = 400/nw
-        // Set the canvas dimensions to the desired resolution
-        // For example, double the original dimensions
-        const newWidth = nw * scale;
-        const newHeight = nh * scale;
 
-        canvas.width = newWidth;
-        canvas.height = newHeight;
-        console.log("new",newWidth, newHeight)
-        console.log("imageHere",image)
-        // Draw the image onto the canvas, scaling it to the new dimensions
-        ctx.drawImage(image, 0, 0, nw, nh,0 , 0, newWidth, newHeight)
-
-
-        // Convert the canvas back to an image (if needed)
-        const newImageUrl = canvas.toDataURL(); // This creates a base64-encoded version of the image
-        setImage(newImageUrl)
-    }
-    if (crop.width > 0 && crop.height > 0) {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-
-        // Ensure image is fully loaded
-        const naturalWidth = imageRef.naturalWidth;
-        const naturalHeight = imageRef.naturalHeight;
-
-    
 
         // Calculate scale factors
-        const scaleX = (naturalWidth / nw);
-        const scaleY = (naturalHeight / nh);
+        const scaleX = (imgRef.current.naturalWidth / nw);
+        const scaleY = (imgRef.current.naturalHeight / nh);
         if(((scaleX*crop.width)<400)||(1.25*crop.height>crop.width)){
             if ((scaleX*crop.width)<400){
                 crop.width=401/scaleX
+                console.log("one resize")
                 setResize(true)
             }
             if(1.25*crop.height>crop.width){
                 setResize(true)
                 crop.height =  crop.width/1.25
+                console.log("two resize")
             }
         }else {
             setResize(false)
@@ -417,13 +444,13 @@ const cropImage = (crop) => {
         canvas.width = w; // Set to new width
         canvas.height = h; // Set to new height
 
-        console.log("nat:", naturalWidth, naturalHeight);
+        console.log("nat:", imageRef.naturalWidth , imageRef.naturalHeight );
         console.log("scales:", scaleX, scaleY);
         console.log("new w and h", nw, nh);
 
         // Draw the image on the canvas
         ctx.drawImage(
-            imageRef,
+            imgRef.current,
             crop.x * scaleX,
             crop.y * scaleY,
             w, // Use new width here
@@ -443,44 +470,52 @@ const cropImage = (crop) => {
         console.error("Invalid crop dimensions");
     }
 };
-
-
-  
-  
-const [crop, setCrop] = useState({ 
-    unit: 'px',  // Unit can be 'px' or '%'
-    height: 100, 
-    width: 150, // Default crop height
-    x: 0,        // Default x position of the crop
-    y: 0         // Default y position of the crop
-    },
-    );
-
-
+    const [ion, setImageorNot] = useState(true)
+    const [ionVal, setionVal] = useState("Remove image")
+    const ImageorNot = () => {
+        setImageorNot(!ion)
+        if (ion){
+            setionVal("Remove image")
+        }
+    }
+    const ImageorNotFull = () => {
+        ImageorNot()
+            console.log("removing")
+            setImage(null)
+            setCroppedImage(null)
+            setCroppedImageSend(null)
+            setImageRef(null)
+            setFileImage(null)
+    }
   
   return (
-    <div style={{ height: "auto", display: 'flex' }}>
-            <Popup trigger={trigger} className="popup-content" position="bottom center" closeOnEscape closeOnDocumentClick>
-                <form onSubmit={handleSubmit} style={{ justifyContent: 'center', height: "auto" }}>
-                    <Col style={{ justifyContent: 'center' }}>
-                        <h3>Enter Your Car's Info</h3>
-                        <Row>
-                            <label htmlFor="imageUpload">Upload Image:</label>
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={onImageUpload}
-                                required
-                                style={{ marginBottom: '10px' }}
-                            />
+    <div style={{ height: "auto", display: 'flex'}}>
+            <Popup trigger={trigger} className="popup-content" position="bottom center"  closeOnEscape closeOnDocumentClick>
+<form onSubmit={handleSubmit} style={{ justifyContent: 'center',height: "auto" , display: 'flex', backgroundColor: 'white'}}>
+                    <Col >
+                            <h3  style= {{marginLeft:'18px'}} >Enter Your Car's Info</h3>
+                        <Row style={{margin: '0 auto'}}>
+                            {!ion && <Row style={{justifyContent:'center', display: 'flex',margin: '0 auto'}}>
+                                <Button onClickCapture={ImageorNotFull} className= "ionButton" style={{width: '316px',backgroundColor:'rgb(110,117,124)'}}>
+                                     {ionVal}
+                                </Button>
+                            </Row>}
+                            {/* { ion && <label htmlFor="imageUpload">Upload Image:</label>} */}
+                            <div style={{height:'10px'}}></div>
+      
+                         { ion && <div class="file-upload" >
+                                <input onChange={onImageUpload} name="fileupload" type="file" id="fileInput" class="file-input" accept="image/*"/>
+                                <label for="fileInput" class="file-label" style={{backgroundColor:'rgb(110,117,124)', margin:'0 auto',paddingLeft:'30px',width:'316px',textAlign:'center'}}>Upload Image of Car</label>
+                                {/* {!image &&<span id="fileName" class="file-name">No file chosen</span>} */}
+                            </div>}
                         </Row>
-                        {image && (
+                        {image  && !ion && (
                             <Row>
                                 <h4>Uploaded Image:</h4>
                                 
                             </Row>
                         )}
-                        {image && (
+                        {image && !ion && (
                             <>
                                 <ReactCrop
                                     crop={crop}
@@ -488,12 +523,12 @@ const [crop, setCrop] = useState({
                                     // maxHeight={300}
                                     // maxWidth={400}
                                      minHeight={50}
-                                     minWidth={50}
+                                     minWidth={minWidth}
                                      maxHeight={400}
                                      maxWidth={400}
                                      aspect={aspect}
                                      keepSelection={true}
-                                    onChange={(newCrop) => {
+                                     onChange={(newCrop) => {
                                         setCrop(newCrop);
                                     }
                                    
@@ -502,6 +537,7 @@ const [crop, setCrop] = useState({
                                     <img src={image}  ref={imgRef} onLoad={getNatural} alt="Uploaded Car" style={{width: '100%', height: '100%' }} />
                                 </ReactCrop>
                                { resized && croppedImage&& <text>Image has been resized. The max aspect ratio is 1.25 </text>}
+                               { minWidth>150 && croppedImage&& <text>Crop size has been maxmized due to low quality image </text>}
                                 {croppedImage && 
                                    
                                 (
@@ -520,7 +556,7 @@ const [crop, setCrop] = useState({
 
 
 
-            <Row><label htmlFor="year">Year:</label></Row>
+            <Row ><label  style= {{marginLeft:'18px'}}htmlFor="year">Year:</label></Row>
                 <Row className='stats-rows'>
                     <Form.Select
                     name= "year"
@@ -537,7 +573,7 @@ const [crop, setCrop] = useState({
                     </Form.Select>
 
                 </Row>
-                <Row><label htmlFor="make">Make:</label></Row>
+                <Row ><label  style= {{marginLeft:'18px'}}  htmlFor="make">Make:</label></Row>
                 <Row className='stats-rows'>
                     <Form.Select
                     name="make"
@@ -557,7 +593,7 @@ const [crop, setCrop] = useState({
 
                     </Form.Select>
                 </Row>
-            <Row style={{ paddingRight: '20px', justifyContent: 'center'}}>
+            <Row style={{ margin:'0 auto', justifyContent: 'center'}}>
                 {(inputData.make === 'Other') && (
                   <input
                     type="text"
@@ -572,7 +608,7 @@ const [crop, setCrop] = useState({
                   />
                 )}
              </Row>
-                <Row><label htmlFor="model">Model:</label></Row>
+                <Row ><span style= {{marginLeft:'18px'}} htmlFor="model">Model:</span></Row>
             <Row className='stats-rows'>
                 <Form.Select
                   name="model"
@@ -593,7 +629,7 @@ const [crop, setCrop] = useState({
 
                 </Form.Select>
                 </Row>
-                <Row style={{paddingRight: '20px', justifyContent: 'center'}}>
+                <Row style={{margin: '0 auto', justifyContent: 'center'}}>
                 {inputData.model === 'Other' && (
                   <input
                     type="text"
@@ -608,13 +644,13 @@ const [crop, setCrop] = useState({
                 )}
               </Row>
 
-            <Row xs={3} style={{paddingTop:'10px', width: '98%', paddingLeft: '10px'}}>
+            <Row xs={3} style={{justifyContent: "center" ,width: '100%', margin: '0 auto'}}>
               <Col style={{textAlign: 'center'}}>
                 <label htmlFor="power">Power(hp):</label>
                 <input
                   type="number"
                   name="power"
-                  style={{ width: '100%', height: '37px'}}
+                  style={{ width: '86%', height: '37px'}}
                   value={inputData.power}
                   onChange={handleInputChange}
                   required
@@ -625,7 +661,7 @@ const [crop, setCrop] = useState({
                 <input
                   type="number"
                   name="torque"
-                  style={{ width: '100%', height: '37px'}}
+                  style={{ width: '86%', height: '37px'}}
                   value={inputData.torque}
                   onChange={handleInputChange}
                   required
@@ -638,7 +674,7 @@ const [crop, setCrop] = useState({
                     value={inputData.drivetrain || ''}
                     onChange={handleInputChange}
                     required
-                    style={{ backgroundColor: 'rgb(110,117,124)',color:'white', width: '100%', height: '40px'}}
+                    style={{ backgroundColor: 'rgb(110,117,124)',color:'white', width: '90%', height: '40px'}}
                     >
                     <option value="">Select</option> {/* Default empty option */}
                     <option value="RWD">RWD</option>
@@ -650,48 +686,70 @@ const [crop, setCrop] = useState({
               </Col>
             </Row>
 
-            <Row style={{width: '80%'}}>
-              <Col>
-        <Form.Group controlId="multiSelectHashtags">
-            <Form.Label>Select up to 4 Hashtags:</Form.Label>
-            <DropdownButton
-    id="dropdown-multiselect"
-    className='dropdown-m'
-    type="button"
-    title={(selectedHashtags.length > 0) ? selectedHashtags.join(' ') : 'Select Hashtags'}
-    variant="secondary"
-    style={{ width: '160px', background: 'white', color: 'grey' }} // Change color here
->
-    {hashtags.map((hashtag, index) => (
+            <Row style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>  {/* Changed to 'flex' for proper centering */}
+  <Form.Group
+    controlId="multiSelectHashtags"
+    style={{ justifyContent: 'center', textAlign: 'center', width: '100%' }} 
+  >
+<Form.Label style={{ textAlign: 'left', width: '100%' , marginLeft: '18px'}}>Select up to 4 Hashtags:</Form.Label>
+
+    <DropdownButton
+      id="dropdown-multiselect"
+      className="dropdown-m"
+      type="button"
+      title={selectedHashtags.length > 0 ? selectedHashtags.join(', ') : 'Select Hashtags'}
+      variant="secondary"
+      style={{
+        width: '280px',           // Set a fixed width to avoid content pushing the button off-center
+        background: 'white',
+        color: 'grey',
+        margin: '0 auto',         // Keep the button centered
+        textAlign: 'center',      // Ensure text inside the button is centered
+      }}
+    >
+      {hashtags.map((hashtag, index) => (
         <Dropdown.Item
-            as="button"
-            type="button"
-            style={{
-                width: '90%',
-                color: selectedHashtags.length >= 4 && !selectedHashtags.includes(hashtag) ? 'grey' : 'black',
-                pointerEvents: selectedHashtags.length >= 4 && !selectedHashtags.includes(hashtag) ? 'none' : 'auto', 
-                opacity: selectedHashtags.length >= 4 && !selectedHashtags.includes(hashtag) ? 0.5 : 1,
-                backgroundColor: selectedHashtags.includes(hashtag) ? 'lightgrey' : 'white' // Change selected item color here
-               
-            }}
-            key={index}
-            eventKey={selectedHashtags}
-            active={selectedHashtags.includes(hashtag)}
-            onClick={() => handleSelect(hashtag)}
-            value={selectedHashtags}
-            onChange={handleInputChange}
+          as="button"
+          type="button"
+          style={{
+            width: '90%',
+            color:
+              selectedHashtags.length >= 4 && !selectedHashtags.includes(hashtag)
+                ? 'grey'
+                : 'black',
+            pointerEvents:
+              selectedHashtags.length >= 4 && !selectedHashtags.includes(hashtag)
+                ? 'none'
+                : 'auto',
+            opacity:
+              selectedHashtags.length >= 4 && !selectedHashtags.includes(hashtag)
+                ? 0.5
+                : 1,
+            backgroundColor: selectedHashtags.includes(hashtag)
+              ? 'lightgrey'
+              : 'white',
+          }}
+          key={index}
+          eventKey={selectedHashtags}
+          active={selectedHashtags.includes(hashtag)}
+          onClick={() => handleSelect(hashtag)}
+          value={selectedHashtags}
+          onChange={handleInputChange}
         >
-            {hashtag}
+          {hashtag}
         </Dropdown.Item>
-    ))}
-</DropdownButton>
-        </Form.Group>
-              </Col>
-            </Row>
-            <Row><label htmlFor="Themes" style={{paddingBottom:'10px'}}>Themes:</label>
+      ))}
+    </DropdownButton>
+  </Form.Group>
+</Row>
+
+
+            <div style={{justifyContent: 'center', marginLeft:'10px'}}> 
+            <Row >
+                <label htmlFor="Themes" style={{ marginLeft:'10px',paddingBottom:'18px'}}>Themes:</label>
             
             </Row>
-           <Row style={{paddingBottom: '10px', paddingRight: '10px', paddingLeft: '10px'}}>
+           <Row style={{paddingBottom: '10px', paddingRight: '8px', paddingLeft: '10px'}}>
             <Col>
                 <button 
                 type="button" 
@@ -746,7 +804,7 @@ const [crop, setCrop] = useState({
                 </button>
             </Col>
             </Row>
-              <Row style={{paddingBottom:'10px', paddingRight:'10px', paddingLeft: '10px'}}>
+              <Row style={{paddingBottom:'10px', paddingRight:'10px', paddingLeft: '10px', justifyContent:'center'}}>
             <Col>
             <button 
                 type="button" 
@@ -852,8 +910,8 @@ const [crop, setCrop] = useState({
                 onClick={() => handleButtonClick(9)}>
                 </button>
             </Col>
-            
             </Row>
+            </div>
             <Row style={{justifyContent: 'center'}}>
                 <button 
                     type="submit" 

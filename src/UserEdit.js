@@ -18,7 +18,7 @@ const UserCarEdit = () => {
   const { user, isLoaded, isSignedIn } = useUser();
   const navigate = useNavigate();
   const [image, setImage] = useState("/images/miata.png")
-  
+  const [imagefile, setImageFile] = useState(null)
   const def = {
     year: "1995",
     make: "Mazda", 
@@ -138,9 +138,10 @@ const UserCarEdit = () => {
     }
   };
 
-  const handleDataSubmit = (submittedData, headImage) => {
+  const handleDataSubmit = (submittedData, headImage, file) => {
     console.log("1")
     setImage(headImage)
+    setImageFile(file)
     setData((prevData) => ({
       ...prevData,
       ...submittedData
@@ -201,7 +202,7 @@ const UserCarEdit = () => {
         <Col>
           <div className="bg" style={{ height: "1000px", background: lightColor }}>
             <div className="stats-lander" style={{ position: 'relative', background: mainColor }}>
-              <Image
+            {imagefile && <Image
                 src={image}
                 className="img-fluid"
                 style={{
@@ -210,7 +211,9 @@ const UserCarEdit = () => {
                   borderBottomLeftRadius: "0px",
                   borderBottomRightRadius: "0px",
                 }}
-              />
+              />}
+              {!imagefile && <div style={{height:'50px'}}></div>}
+
               <div className="settings-overlay">
                 <SettingsDropdown className="settings-drop" />
               </div>
@@ -263,6 +266,7 @@ const UserCarEdit = () => {
                 modal
                 onSub={handleDataSubmit}
                 input={inputData}
+                imageFile={imagefile}
               />}
             </div>
 
