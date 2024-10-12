@@ -12,28 +12,20 @@ import PopupWithStatInput from './statsPopup';
 import PopupForMods from './modPopup';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import useFetchProfileData from './fetchProfileData';
+import { Cloudinary } from '@cloudinary/url-gen';
+import { v2 as cloudinary } from 'cloudinary'
+import 'dotenv/config';
+
 
 const UserCarEdit = () => {
   const { username } = useParams();
   const { user, isLoaded, isSignedIn } = useUser();
   const navigate = useNavigate();
-  const [image, setImage] = useState("/images/miata.png")
+  const [image, setImage] = useState(null)
   const [imagefile, setImageFile] = useState(null)
-  const def = {
-    year: "1995",
-    make: "Mazda", 
-    model: "MX-5 Miata",
-    power: "0",
-    torque: "0",
-    drivetrain: "RWD",
-    hashtags: "#hashtag",
-    lightColor: "bisque",
-    mainColor: "lightsalmon",
-    darkColor: "darksalmon",
-    mods: []
-};
 
-  const [inputData, setData] = useState(def);
+
+  const [inputData, setData] = useState(null);
 
   const [isToggled, setIsToggled] = useState(false);
   const [responseMessage, setResponseMessage] = useState('');
@@ -42,7 +34,7 @@ const UserCarEdit = () => {
   const [tryedFetch, setTryedFetch] = useState(false);
 
 
-  let key;
+  let key
   useFetchProfileData( key, isSignedIn, tryedFetch, setTryedFetch, inputData, setData, setError, navigate)
     console.log("data is ", inputData)
   useEffect(() => {
@@ -95,10 +87,9 @@ const UserCarEdit = () => {
 
 
 
-  if (!isLoaded) {
+  if (!isLoaded || !tryedFetch) {
     return <div>Loading...</div>;
   }
-
   if (!isSignedIn) {
     navigate('/');
     return null;
@@ -107,6 +98,108 @@ const UserCarEdit = () => {
     navigate(`/${user.username}/edit`);
     return null;
   }
+  if(isLoaded && isSignedIn){
+    key = user.username;
+ }
+
+// Call the function to get the signature when you want to upload
+
+
+
+
+  const getImageDetails = async (public_id) => {
+    try {
+        const response = await fetch(`/api/photo/${public_id}`);
+    
+        if (!response.ok) {
+          throw new Error(`Error fetching image details: ${response.statusText}`);
+        }
+    
+        const data = await response.json();
+        console.log('Fetched image details:', data);
+        setImage(data.url) ;
+      } catch (error) {
+        console.error('Error:', error);
+      }
+  };
+
+  if(isLoaded && isSignedIn){
+    getImageDetails(user.username)
+ }
+
+ const cloudName = process.env.CLOUD_NAME 
+ const apiKey = process.env.CLOUD_KEY
+
+  async function uploadImage(file) {
+    const endpoint = "/api/sig"; // Replace with your backend endpoint URL that handles uploads
+  
+    // Create FormData and append the necessary parameters
+    const formData = new FormData();
+    formData.append("file", file); // The file to be uploaded
+    formData.append("api_key", apiKey); // Your Cloudinary API Key
+    formData.append("upload_preset", "userProfiles"); // Optional: your upload preset
+    formData.append("resource_type", "image"); // Specify the resource type (e.g., 'image')
+    formData.append("public_id", key); // Specify the resource type (e.g., 'image')
+
+    // Fetch request to upload the image
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        body: formData,
+      });
+  
+      // Handle the response from your backend
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`Error uploading image: ${response.status} - ${errorText}`);
+        throw new Error(`Error uploading image: ${response.statusText}`);
+      }
+  
+      const data = await response.json();
+      console.log('Upload successful:', data);
+  
+      // Handle the uploaded image data as needed
+      return data; // You can return or process the data further
+  
+    } catch (error) {
+      console.error('Upload failed:', error.message);
+      throw error; // You may choose to handle this in the calling context
+    }
+  }
+
+  // const uploadImage = async (file) => {
+  //   console.log("cloud")
+  //   const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`; // Change YOUR_CLOUD_NAME
+  //   const uploadPreset = "userProfiles"; // Replace with your unsigned upload preset
+  
+  //   const formData = new FormData();
+  //   formData.append("file", file);
+  //   formData.append("upload_preset", uploadPreset);
+  //   formData.append("public_id", key);
+  //   formData.append("quality", "auto:low"); 
+  //   formData.append("overwrite", "true");
+  //   formData.append("format", "jpg");
+  //   formData.append("signature", sig);
+  
+  //   try {
+  //     const response = await fetch(cloudinaryUrl, {
+  //       method: "POST",
+  //       body: formData,
+  //     });
+  
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       console.log('Uploaded image data:', data);
+  //       return data.secure_url; // The URL of the uploaded image
+  //     } else {
+  //       throw new Error('Image upload failed');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error during image upload:', error);
+  //   }
+  // };
+
+
 
   const handleUpdate = async () => {
     console.log("handleUpdate");
@@ -114,8 +207,6 @@ const UserCarEdit = () => {
       console.error("Input data is null, cannot update.",inputData);
       return;
     }
-
-    const key = user.username;
     try {
       console.log("doinghandleUpdate", inputData);
       const response = await fetch(`/api/setprofiles/${key}`, {
@@ -147,6 +238,9 @@ const UserCarEdit = () => {
       ...submittedData
     }));
     needRe(true);
+    uploadImage(headImage)
+    getImageDetails(key)
+   // uploadImage("/public/images/miata.png")
   };
 
   const handleDataSubmitTwo = (submittedData) => {
@@ -202,7 +296,7 @@ const UserCarEdit = () => {
         <Col>
           <div className="bg" style={{ height: "1000px", background: lightColor }}>
             <div className="stats-lander" style={{ position: 'relative', background: mainColor }}>
-            {imagefile && <Image
+            {image && <Image
                 src={image}
                 className="img-fluid"
                 style={{
@@ -212,7 +306,7 @@ const UserCarEdit = () => {
                   borderBottomRightRadius: "0px",
                 }}
               />}
-              {!imagefile && <div style={{height:'50px'}}></div>}
+              {!image && <div style={{height:'50px'}}></div>}
 
               <div className="settings-overlay">
                 <SettingsDropdown className="settings-drop" />

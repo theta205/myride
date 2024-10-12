@@ -10,6 +10,11 @@
     width: 90%;
     height: 40px;
 }
+.statInput{
+    border-radius: 8px;
+    height: 39px;
+    text-align: center;
+}
 
 
 .stats-rows{

@@ -11,7 +11,7 @@ const useFetchProfileData = ( key, isSignedIn, tryedFetch, setTryedFetch, inputD
           key = user.username
           console.log("key is",key)
         }
-      if (key && !tryedFetch && tryedFetch!=undefined) {
+      if (key && !tryedFetch ) {
         console.log("inside fetch");
         const fetchData = async () => {
           try {
@@ -30,9 +30,21 @@ const useFetchProfileData = ( key, isSignedIn, tryedFetch, setTryedFetch, inputD
             setError((prevError) => prevError !== err.message ? err.message : prevError);
             console.log("Error fetching data", err);
             setTryedFetch(true)
+            const def = {
+              year: "1995",
+              make: "Mazda", 
+              model: "MX-5 Miata",
+              power: "0",
+              torque: "0",
+              drivetrain: "RWD",
+              hashtags: "#hashtag",
+              lightColor: "bisque",
+              mainColor: "lightsalmon",
+              darkColor: "darksalmon",
+              mods: []}
+              setData(def)
           }
         };
-
         console.log("fetching");
         fetchData();
         console.log("after fetch");

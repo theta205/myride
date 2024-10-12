@@ -13,9 +13,10 @@ import { useNavigate } from 'react-router-dom';
 import SettingsDropdown from './SettingsDropdown';
 import { useEffect, useState } from 'react';
 import useFetchProfileData from './fetchProfileData';
-import { CSSTransition, TransitionGroup } from 'react-transition-group'; // Import transitions
+import { CSSTransition, TransitionGroup } from 'react-transition-group'; 
 
 const  UserPage = () => {
+  const [image, setImage] = useState(null)
   const { user, isLoaded, isSignedIn } = useUser();
   const navigate = useNavigate();
   const { username }= useParams();
@@ -61,8 +62,25 @@ const  UserPage = () => {
   const handleToggle = () => {
     setIsToggled(prevState => !prevState);
   };
-  console.log("data",inputData)
-  return ( 
+  const getImageDetails = async (public_id) => {
+    try {
+        const response = await fetch(`/api/photo/${public_id}`);
+    
+        if (!response.ok) {
+          throw new Error(`Error fetching image details: ${response.statusText}`);
+        }
+    
+        const data = await response.json();
+        console.log('Fetched image details:', data);
+        setImage(data.url) ;
+      } catch (error) {
+        console.error('Error:', error);
+      }
+  };
+  getImageDetails(username)
+
+
+return ( 
 <Container className="d-flex justify-content-center vh-100">
         <Row>
           <Col>
@@ -70,8 +88,8 @@ const  UserPage = () => {
           <div className="stats-lander" style={{ position: 'relative', background: inputData.mainColor }}>
                 
                 {/* Image of the Miata */}
-                <Image
-                  src="/images/miata.png"
+               { image && <Image
+                  src={image}
                   className="img-fluid"
                   style={{
                     width: "auto",
@@ -79,8 +97,8 @@ const  UserPage = () => {
                     borderBottomLeftRadius: "0px",
                     borderBottomRightRadius: "0px",
                   }}
-                />
-                
+                />}
+                  {!image && <div style={{height:'50px'}}></div>}
                 {/* SettingsDropdown overlay */}
                 <div className="settings-overlay" >
                   <SettingsDropdown className="settings-drop" />

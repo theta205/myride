@@ -13,6 +13,7 @@ import { auto } from '@cloudinary/url-gen/actions/resize';
 import { autoGravity } from '@cloudinary/url-gen/qualifiers/gravity';
 import { AdvancedImage } from '@cloudinary/react';
 import ReactCrop from 'react-image-crop';
+import { Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { makeAspectCrop } from 'react-image-crop';
 import { heic } from '@cloudinary/url-gen/qualifiers/format';
@@ -20,7 +21,6 @@ import { heic } from '@cloudinary/url-gen/qualifiers/format';
 const PopupWithStatInput = ({ trigger, onSub, input, imageFile }) => {
    // console.log(imageFile)
     const [inputData, setInputData] = useState(input);
-
     const hashtags = [
         '#Manual',
         '#Bagged',
@@ -51,16 +51,9 @@ const PopupWithStatInput = ({ trigger, onSub, input, imageFile }) => {
     const [aspect,setAspect]= useState(null)
     const [minWidth, setMinWidth] =useState(50)
     const [imagefile, setFileImage] = useState(imageFile)
-    const [crop, setCrop] = useState({ 
-        unit: 'px',  // Unit can be 'px' or '%'
-        height: 100, 
-        width: 380,
-        x: 0,        // Default x position of the crop
-        y: 0         // Default y position of the crop
-        },
-        );
-
-
+    const [crop, setCrop] = useState(null)
+      
+    
 
     useEffect(() => {
         const fetchData = async () => {
@@ -333,23 +326,18 @@ const onImageUpload = (e) => {
             img.onload = () => {
                 console.log("in on load")
                 setImageRef(img); 
+                                
                 // const naturalWidth = imgRef.current.naturalWidth;
                 // setMinWidth((400/naturalWidth)*400)
-                setCrop({ 
-                    unit: '%',  // Unit can be 'px' or '%'
-                    height: 100,
-                    width: 100,
-                    x: 0,        // Default x position of the crop
-                    y: 0         // Default y position of the crop
-                    },
-                );
-            };
+                
+            };  
         };
         reader.readAsDataURL(file);
     } else {
         alert('Please upload a valid image file.');
     }
     ImageorNot();
+    
 };
 
 const onImageLoaded = (img) => {
@@ -362,6 +350,8 @@ const onImageLoaded = (img) => {
 const onCropComplete = (crop) => {
     if (crop.width > 0 && crop.height > 0) {
         cropImage(crop);
+        console.log("un",crop)
+
         console.log("cropped:", crop);
     } else {
         console.error("Invalid crop dimensions:", crop);
@@ -369,25 +359,28 @@ const onCropComplete = (crop) => {
 };
 const imgRef = useRef(null);
 const getNatural = () => {
+    console.log("dasdsad", crop)
+   
     const displayedWidth = imgRef.current.clientWidth;
     const displayedHeight = imgRef.current.clientHeight;
-    setNH(imgRef.current.clientHeight)
-    setNW(imgRef.current.clientWidth)
 
     console.log(`Displayed Width: ${displayedWidth}px`);
     console.log(`Displayed Height: ${displayedHeight}px`);
         const naturalWidth = imgRef.current.naturalWidth;
         const naturalHeight = imgRef.current.naturalHeight;
         console.log("nnatural", naturalWidth,naturalHeight)
+        setNW(displayedWidth)
+        setNH(displayedHeight)
+
         setMinWidth((400/naturalWidth)*400)
         if (naturalWidth<400){
             console.log("in if")
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
-            const scale = 400/nw
+            const scale = 400/displayedWidth
             // Set the canvas dimensions to the desired resolution
-            const newWidth = nw * scale;
-            const newHeight = nh * scale;
+            const newWidth = displayedWidth * scale;
+            const newHeight = displayedHeight * scale;
 
             canvas.width = newWidth;
             canvas.height = newHeight;
@@ -400,56 +393,64 @@ const getNatural = () => {
             }
             const base64Image2 = canvas.toDataURL('image/jpeg');
             setImage(base64Image2);
+
         }
+        console.log("feihfqhjsdabfjs",imgRef.current.clientHeight)
+        setCrop({
+            unit: 'px', // Can be 'px' or '%'
+            x: 0,
+            y: 0,
+            width: 380,
+            height: Math.min(304,imgRef.current.clientHeight)
+          })  
+        cropImage({
+            unit: 'px', // Can be 'px' or '%'
+            x: 0,
+            y: 0,
+            width: 380,
+            height: Math.min(304,imgRef.current.clientHeight)
+          })
     
 }
 const  cropImage = (crop) => {
-    if (!imgRef) {
+    if (!imgRef || !crop) {
         console.error("Image reference is not set");
         return;
     }
-
-    console.log("Image:", imgRef);
-    console.log("nhere",nw)
-    console.log("Crop dimensions:", crop.width, crop.height);
-    if (imageRef && (crop.width > 0 && crop.height > 0)) {
-        console.log("imageHere",imgRef)
+    if ((crop.width > 0 && crop.height > 0)) {
 
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
 
-
+        console.log("asdas",imgRef.current.naturalWidth, nw)
         // Calculate scale factors
-        const scaleX = (imgRef.current.naturalWidth / nw);
-        const scaleY = (imgRef.current.naturalHeight / nh);
+        const scaleX = (imgRef.current.naturalWidth / imgRef.current.clientWidth);
+        const scaleY = (imgRef.current.naturalHeight / imgRef.current.clientHeight);
+        console.log((scaleX*crop.width))
         if(((scaleX*crop.width)<400)||(1.25*crop.height>crop.width)){
             if ((scaleX*crop.width)<400){
                 crop.width=401/scaleX
-                console.log("one resize")
+                console.log("resize 1")
                 setResize(true)
             }
             if(1.25*crop.height>crop.width){
                 setResize(true)
                 crop.height =  crop.width/1.25
-                console.log("two resize")
             }
         }else {
             setResize(false)
         }
         // Calculate new width and height based on crop and scale
-        const w = crop.width * scaleX; // New width
+        const w = Math.min(380,crop.width) * scaleX; // New width
         const h = crop.height * scaleY; // New height
-
         // Set canvas size to the new dimensions
         canvas.width = w; // Set to new width
-        canvas.height = h; // Set to new height
-
-        console.log("nat:", imageRef.naturalWidth , imageRef.naturalHeight );
-        console.log("scales:", scaleX, scaleY);
-        console.log("new w and h", nw, nh);
-
+        canvas.height = h; // Set to new heigh
         // Draw the image on the canvas
-        ctx.drawImage(
+        console.log("scale" ,scaleX,scaleY)
+        console.log("h",crop.x * scaleX,
+            crop.y * scaleY,w,h)
+        ctx.drawImage(    
             imgRef.current,
             crop.x * scaleX,
             crop.y * scaleY,
@@ -472,6 +473,7 @@ const  cropImage = (crop) => {
 };
     const [ion, setImageorNot] = useState(true)
     const [ionVal, setionVal] = useState("Remove image")
+
     const ImageorNot = () => {
         setImageorNot(!ion)
         if (ion){
@@ -481,39 +483,46 @@ const  cropImage = (crop) => {
     const ImageorNotFull = () => {
         ImageorNot()
             console.log("removing")
+            setCrop(null)
             setImage(null)
             setCroppedImage(null)
             setCroppedImageSend(null)
             setImageRef(null)
             setFileImage(null)
+            setNW(null)
+            setNH(null)
+            
+        
     }
-  
   return (
-    <div style={{ height: "auto", display: 'flex'}}>
+
+    <div style={{ height: "auto", display: 'flex', justifyContent: 'center'}}>
             <Popup trigger={trigger} className="popup-content" position="bottom center"  closeOnEscape closeOnDocumentClick>
 <form onSubmit={handleSubmit} style={{ justifyContent: 'center',height: "auto" , display: 'flex', backgroundColor: 'white'}}>
                     <Col >
-                            <h3  style= {{marginLeft:'18px'}} >Enter Your Car's Info</h3>
-                        <Row style={{margin: '0 auto'}}>
-                            {!ion && <Row style={{justifyContent:'center', display: 'flex',margin: '0 auto'}}>
+                    <Row style={{ marginLeft: '1px', display: 'flex', justifyContent: 'center', width: '100%' }}>
+                    <p style={{ fontSize: '2em', fontFamily: 'Secular One, sans-serif',fontWeight: 'light' ,textAlign:'center'}}>Enter Your Car's Info</p>
+                    </Row>
+                        <Row style={{margin: '0 auto', marginBottom: '5px'}}>
+                            {!ion && <Row style={{justifyContent:'center', display: 'flex',height: '43px', margin: '0 auto'}}>
                                 <Button onClickCapture={ImageorNotFull} className= "ionButton" style={{width: '316px',backgroundColor:'rgb(110,117,124)'}}>
                                      {ionVal}
                                 </Button>
                             </Row>}
-                            {/* { ion && <label htmlFor="imageUpload">Upload Image:</label>} */}
-                            <div style={{height:'10px'}}></div>
-      
+                            {/* { ion && <label htmlFor="imageUpload">Upload Image:</label>} */}      
                          { ion && <div class="file-upload" >
                                 <input onChange={onImageUpload} name="fileupload" type="file" id="fileInput" class="file-input" accept="image/*"/>
-                                <label for="fileInput" class="file-label" style={{backgroundColor:'rgb(110,117,124)', margin:'0 auto',paddingLeft:'30px',width:'316px',textAlign:'center'}}>Upload Image of Car</label>
+                                <label for="fileInput" class="file-label ionButton" style={{backgroundColor:'rgb(110,117,124)',  alignItems: "center", margin:'0 auto',paddingLeft:'30px',width:'316px',height:'auto',textAlign:'center',fontSize:'15px'}}>Upload Image of Car</label>
                                 {/* {!image &&<span id="fileName" class="file-name">No file chosen</span>} */}
                             </div>}
+
                         </Row>
                         {image  && !ion && (
                             <Row>
-                                <h4>Uploaded Image:</h4>
-                                
+                                <h5>Uploaded Image:</h5>
+                                <Row style={{marginBottom:'17px',  marginLeft: '10px'}}><sub>Crop your image </sub></Row>
                             </Row>
+                           
                         )}
                         {image && !ion && (
                             <>
@@ -531,13 +540,14 @@ const  cropImage = (crop) => {
                                      onChange={(newCrop) => {
                                         setCrop(newCrop);
                                     }
-                                   
                                     }
                                     >
-                                    <img src={image}  ref={imgRef} onLoad={getNatural} alt="Uploaded Car" style={{width: '100%', height: '100%' }} />
+                                    
+                                    <img src={image}  ref={imgRef} onLoad={getNatural} alt="Uploaded Car" style={{width: '100%',   height: '100%' }} />
                                 </ReactCrop>
-                               { resized && croppedImage&& <text>Image has been resized. The max aspect ratio is 1.25 </text>}
-                               { minWidth>150 && croppedImage&& <text>Crop size has been maxmized due to low quality image </text>}
+                                {croppedImage && <Row><h5 title="This will be on your page upon submission">Cropped Image: &#x2139; </h5></Row>}
+                                { minWidth>150 && croppedImage&& <Row style={{marginBottom:'17px', marginLeft: '10px'}}><sub>Crop size has been maxmized due to low quality image </sub></Row>}
+                               { resized && croppedImage && <Row style={{ marginLeft: '10px',marginBottom:'17px',}}><sub>Image has been resized. The max aspect ratio is 1.25 </sub></Row>}
                                 {croppedImage && 
                                    
                                 (
@@ -546,7 +556,7 @@ const  cropImage = (crop) => {
                                    <img 
                                        src={croppedImage} 
                                        alt="Cropped Image" 
-                                       style={{ marginTop: '10px', width: 'auto', height:'auto',maxWidth: '100%', maxHeight: '100%', display: 'block' }} 
+                                       style={{ marginBottom: '10px',marginTop: '10px', width: 'auto', height:'auto',border: '5px solid black', maxWidth: '100%', maxHeight: '100%',display: 'block' }} 
                                    />
                              //  </div>
                                 )}
@@ -556,7 +566,7 @@ const  cropImage = (crop) => {
 
 
 
-            <Row ><label  style= {{marginLeft:'18px'}}htmlFor="year">Year:</label></Row>
+            <Row ><h5  style= {{marginLeft:'18px'}}htmlFor="year">Year:</h5></Row>
                 <Row className='stats-rows'>
                     <Form.Select
                     name= "year"
@@ -573,7 +583,7 @@ const  cropImage = (crop) => {
                     </Form.Select>
 
                 </Row>
-                <Row ><label  style= {{marginLeft:'18px'}}  htmlFor="make">Make:</label></Row>
+                <Row ><h5  style= {{marginLeft:'18px'}}  htmlFor="make">Make:</h5></Row>
                 <Row className='stats-rows'>
                     <Form.Select
                     name="make"
@@ -608,7 +618,7 @@ const  cropImage = (crop) => {
                   />
                 )}
              </Row>
-                <Row ><span style= {{marginLeft:'18px'}} htmlFor="model">Model:</span></Row>
+                <Row ><h5 style= {{marginLeft:'18px'}} htmlFor="model">Model:</h5></Row>
             <Row className='stats-rows'>
                 <Form.Select
                   name="model"
@@ -648,9 +658,14 @@ const  cropImage = (crop) => {
               <Col style={{textAlign: 'center'}}>
                 <label htmlFor="power">Power(hp):</label>
                 <input
-                  type="number"
+                  type="text"
                   name="power"
-                  style={{ width: '86%', height: '37px'}}
+                  min="0"
+                  max="10000"
+                  step="1"
+                  pattern="^[1-9][0-9]*$"
+                  className='statInput'
+                  style={{ width: '86%'}}
                   value={inputData.power}
                   onChange={handleInputChange}
                   required
@@ -659,9 +674,14 @@ const  cropImage = (crop) => {
               <Col style={{textAlign: 'center'}}>
                 <label htmlFor="torque">Torque(lb/ft):</label>
                 <input
-                  type="number"
+                  type="text"
                   name="torque"
-                  style={{ width: '86%', height: '37px'}}
+                  min="0"
+                  step="1"
+                  pattern="^[1-9][0-9]*$"
+                  max="10000"
+                  className='statInput'
+                  style={{ width: '86%'}}
                   value={inputData.torque}
                   onChange={handleInputChange}
                   required
@@ -689,9 +709,9 @@ const  cropImage = (crop) => {
             <Row style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>  {/* Changed to 'flex' for proper centering */}
   <Form.Group
     controlId="multiSelectHashtags"
-    style={{ justifyContent: 'center', textAlign: 'center', width: '100%' }} 
+    style={{ justifyContent: 'center', textAlign: 'center',}} 
   >
-<Form.Label style={{ textAlign: 'left', width: '100%' , marginLeft: '18px'}}>Select up to 4 Hashtags:</Form.Label>
+<h5 style={{  width: '96.5%'  , justifyContent: ' center' ,marginLeft: '18px'}}>Select up to 4 Hashtags:  </h5>
 
     <DropdownButton
       id="dropdown-multiselect"
@@ -700,11 +720,12 @@ const  cropImage = (crop) => {
       title={selectedHashtags.length > 0 ? selectedHashtags.join(', ') : 'Select Hashtags'}
       variant="secondary"
       style={{
-        width: '280px',           // Set a fixed width to avoid content pushing the button off-center
+        width: '330px',           // Set a fixed width to avoid content pushing the button off-center
         background: 'white',
         color: 'grey',
         margin: '0 auto',         // Keep the button centered
-        textAlign: 'center',      // Ensure text inside the button is centered
+        textAlign: 'center', 
+        paddingLeft:'23px'     // Ensure text inside the button is centered
       }}
     >
       {hashtags.map((hashtag, index) => (
@@ -712,7 +733,7 @@ const  cropImage = (crop) => {
           as="button"
           type="button"
           style={{
-            width: '90%',
+            width: '100%',
             color:
               selectedHashtags.length >= 4 && !selectedHashtags.includes(hashtag)
                 ? 'grey'
@@ -746,7 +767,7 @@ const  cropImage = (crop) => {
 
             <div style={{justifyContent: 'center', marginLeft:'10px'}}> 
             <Row >
-                <label htmlFor="Themes" style={{ marginLeft:'10px',paddingBottom:'18px'}}>Themes:</label>
+                <h5 htmlFor="Themes" style={{ marginLeft:'10px',paddingTop:'10px'}}>Themes:</h5>
             
             </Row>
            <Row style={{paddingBottom: '10px', paddingRight: '8px', paddingLeft: '10px'}}>

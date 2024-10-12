@@ -12,6 +12,7 @@ import PopupWithStatInput from './statsPopup';
 import PopupForMods from './modPopup';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Cloudinary } from '@cloudinary/url-gen';
+import { v2 as cloudinary } from 'cloudinary'
 import { auto } from '@cloudinary/url-gen/actions/resize';
 import { autoGravity } from '@cloudinary/url-gen/qualifiers/gravity';
 import { AdvancedImage } from '@cloudinary/react';
@@ -19,18 +20,15 @@ import { AdvancedImage } from '@cloudinary/react';
 
 const Test = () => {
 
-    const cld = new Cloudinary({ cloud: { cloudName: 'duv7zmdkz' } });
-  
-  // Use this sample image or upload your own via the Media Explorer
-//   const img = cld
-//         .image('cld-sample-5')
-//         .format('auto') // Optimize delivery by resizing and applying auto-format and auto-quality
-//         .quality('auto')
-//         .resize(auto().gravity(autoGravity()).width(500).height(500)); // Transform the image: auto-crop to square aspect_ratio
-
-//   return (<AdvancedImage cldImg={img}/>);
-
-  
+    cloudinary.config({
+        cloud_name: "duv7zmdkz",
+        api_key: "166311878598385",
+        api_secret: "MAdK2AQ-XE1VwC9-JNgqLjCM6e0"
+    })
+    const cloudName = 'duv7zmdkz'; // Replace with your Cloudinary cloud name
+    const apiKey = 'Y166311878598385';         // Replace with your Cloudinary API key
+    const apiSecret = 'MAdK2AQ-XE1VwC9-JNgqLjCM6e0';
+    
   const { username } = useParams();
   const { user, isLoaded, isSignedIn } = useUser();
   const navigate = useNavigate();
@@ -89,6 +87,51 @@ const Test = () => {
       return;
     }
   };
+  const getImageDetails = async (public_id) => {
+    try {
+        const response = await fetch(`/api/photo/${public_id}`);
+    
+        if (!response.ok) {
+          throw new Error(`Error fetching image details: ${response.statusText}`);
+        }
+    
+        const data = await response.json();
+        console.log('Fetched image details:', data);
+        return data;
+      } catch (error) {
+        console.error('Error:', error);
+      }
+  };
+  getImageDetails("theta205")
+
+  const uploadImage = async (file) => {
+    console.log("cloud")
+    const cloudinaryUrl = `https://api.cloudinary.com/v1_1/duv7zmdkz/image/upload`; // Change YOUR_CLOUD_NAME
+    const uploadPreset = "userProfiles"; // Replace with your unsigned upload preset
+  
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", uploadPreset);
+    formData.append("public_id", "theta205");
+  
+    try {
+      const response = await fetch(cloudinaryUrl, {
+        method: "POST",
+        body: formData,
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Uploaded image data:', data);
+        return data.secure_url; // The URL of the uploaded image
+      } else {
+        throw new Error('Image upload failed');
+      }
+    } catch (error) {
+      console.error('Error during image upload:', error);
+    }
+  };
+  
 
   const handleDataSubmit = (submittedData,image,file) => {
     console.log("1")
@@ -100,8 +143,9 @@ const Test = () => {
       ...prevData,
       ...submittedData
     }));
-    needRe(true);
+    uploadImage(image)
   };
+
 
   const handleDataSubmitTwo = (submittedData) => {
     console.log("2");
