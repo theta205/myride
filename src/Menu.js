@@ -13,7 +13,7 @@ function Menu() {
     const { user, isLoaded, isSignedIn } = useUser();
   
     return (
-        <Navbar expand="true" className="bg-body-tertiary">
+        <Navbar expand="true" className="bg-body-tertiary" >
             <Container>
                 <Navbar.Brand href="/"style={{ fontSize: '2rem' }}>MyRide</Navbar.Brand>
                 <div className="d-flex align-items-center">

@@ -12,8 +12,6 @@ import PopupWithStatInput from './statsPopup';
 import PopupForMods from './modPopup';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import useFetchProfileData from './fetchProfileData';
-import { Cloudinary } from '@cloudinary/url-gen';
-import { v2 as cloudinary } from 'cloudinary'
 import 'dotenv/config';
 
 
@@ -23,10 +21,7 @@ const UserCarEdit = () => {
   const navigate = useNavigate();
   const [image, setImage] = useState(null)
   const [imagefile, setImageFile] = useState(null)
-
-
   const [inputData, setData] = useState(null);
-
   const [isToggled, setIsToggled] = useState(false);
   const [responseMessage, setResponseMessage] = useState('');
   const [error, setError] = useState('');
@@ -49,7 +44,7 @@ const UserCarEdit = () => {
       handleUpdate();
       needRe(false);
     }
-  }, [re]);
+  }, [re, handleUpdate,inputData]);
 
   // useEffect(() => {
   //   console.log("params", !inputData, isLoaded, tryedFetch);
@@ -127,7 +122,6 @@ const UserCarEdit = () => {
     getImageDetails(user.username)
  }
 
- const cloudName = process.env.CLOUD_NAME 
  const apiKey = process.env.CLOUD_KEY
 
   async function uploadImage(file) {

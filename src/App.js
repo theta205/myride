@@ -13,6 +13,7 @@ import Menu from './Menu';
 import Login from './login';
 import Store from './store';
 import Test from './test';
+import Setup from './setup';
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -33,7 +34,8 @@ function App() {
           <Route path="/signin" element={<Login />} />
           <Route path="/404" element={<NotFound />} />
           <Route path="/test" element={<Test/>} />
-          <Route path="/:username" element={<UserRoute />} /> {/* Dynamic route */}
+          <Route path="/setup" element={<Setup/>} />
+          <Route path="/:username" element={<UserRoute/>} /> {/* Dynamic route */}
           {/* <Route path="/api/profiles/:key" element={<Store />}> </Route> */}
           <Route 
             path="/:username/edit" // Dynamic route for usernames
@@ -41,7 +43,7 @@ function App() {
           />
           {/* You can also add other routes here */}
         </Routes>
-      </BrowserRouter>
+      </BrowserRouter> 
       
     </div>
   );

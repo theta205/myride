@@ -1,76 +1,76 @@
 .mainContainer {
-  flex-direction: column;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100vh;
-}
-.custom-login-btn {
-  height: 40px; /* Set to the height of your navbar */
+  height: auto; /* Remove fixed height to allow it to expand */
+} 
+.App2 {
+  justify-content: center;
+  margin: 0 auto;
   display: flex;
-  align-items: center; /* Center vertically */
-  justify-content: center; /* Center horizontally */
-  padding: 0; /* Remove padding */
-  border: none; /* Optional: Remove border for a cleaner look */
-  background: transparent; 
+  width: 100%; /* Ensure it takes full width */
+} 
+
+.mainContainer, 
+.titleContainer {
+  width: 50%; /* Each will take 50% width on larger screens */
+  box-sizing: border-box; /* Include padding and border in width calculations */
 }
 
-.navbar-nav .nav-link {
-  padding: 1rem; /* Adjust padding to match the height */
+.App2 {
+  display: flex; /* Use flexbox for the parent container */
 }
 
+.header-text {
+  font-size: 34px;
+  font-weight: bolder;
+  padding-bottom: 35px;
+}
 
 .titleContainer {
   display: flex;
-  flex-direction: column;
-  font-size: 64px;
+  font-size: 34px;
   font-weight: bolder;
   align-items: center;
   justify-content: center;
+  text-align: center;
+  height: auto; /* Allow the height to be dynamic */
+  min-height: 200px; /* Set minimum height */
 }
 
-.resultContainer, .historyItem { 
-  flex-direction: row;
+/* Button container styles */
+.button-container {
   display: flex;
-  width: 400px;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column; /* Stack elements vertically */
+  align-items: center; /* Center horizontally */
+  justify-content: center; /* Center vertically */
 }
 
-.historyContainer {
-  flex-direction: column;
-  display: flex;
-  height: 200px;
-  align-items: center;
-  flex-grow: 5;
-  justify-content: flex-start;
+/* Additional styles */
+.share-text {
+  margin-bottom: 10px; /* Space between text and button */
+  font-size: 34px; /* Text styling */
 }
 
-.buttonContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 260px;
+.inputButton {
+  padding: 10px 20px;
+  font-size: 16px;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px; /* Rounded button corners */
 }
 
-.inputContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
+/* Ensure no fixed widths are restricting your layout */
+@media (max-width: 768px) {
+  .mainContainer, .titleContainer {
+    width: 50%; /* Set both to 50% width */
+    box-sizing: border-box; /* Include padding and border in width calculations */
+  }
+
+  .App2 {
+    display: flex; /* Ensure the parent is flex */
+    flex-wrap: wrap; /* Allow wrapping */
+  }
 }
 
-.inputContainer > .errorLabel {
-  color: red;
-  font-size: 12px;
-}
-
-.inputBox {
-  height: 48px;
-  width: 400px;
-  font-size: large;
-  border-radius: 8px;
-  border: 1px solid grey;
-  padding-left: 8px;
-}

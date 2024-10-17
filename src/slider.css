@@ -1,0 +1,32 @@
+.slider {
+    overflow: hidden;
+    margin: 0 auto;
+    justify-content: center; /* Center children horizontally */
+    width: 100%; /* Make the width responsive */
+    max-width: 100%; /* Adjust based on viewport width */
+    box-shadow: 1px 9px 10px rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+}
+
+.slider-images {
+    display: flex; /* Use flex to layout images in a row */
+    transition: transform 0.5s ease-in-out; /* Smooth transition for sliding */
+}
+
+.slide {
+    width: 100%; /* Each slide takes full width of the slider */
+}
+
+img {
+    width: 100%; /* Images take full width of their container */
+    height: auto; /* Maintain aspect ratio */
+    object-fit: cover; /* Cover the entire area */
+}
+
+/* Add this to ensure columns have consistent height */
+.mainContainer, .titleContainer {
+    display: flex;
+    justify-content: flex-start; /* Align to the top */
+    align-items: center; /* Center items horizontally */
+    min-height: 300px; /* Set a minimum height for consistent layout */
+}
