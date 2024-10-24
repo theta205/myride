@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 
 
 
-
 function Login() {
   // Use the useUser hook to get the details about the logged-in user
   const { user, isSignedIn, isLoaded } = useUser();
@@ -14,21 +13,22 @@ function Login() {
 
 
   return (
-    <div>
+    <div  style={{height: 'auto', alignContent: 'center', textAlign: 'center'}}>
         {/* Signed out state */}
         <SignedOut>
-          <SignInButton  className = 'custom-login-btn'>
-            <input className='inputButton' type="button" value='Log in' style={{paddingTop:'1px', background: 'transparent', color:'black',  border: "1px solid grey" }}/>
+          <SignInButton>
+            <input className='inputButton' type="button" value='Log in' style={{ height: 'auto', textAlign: 'center' ,background: 'transparent', color:'black',  border: "1px solid grey" }}/>
           </SignInButton>
         </SignedOut>
 
         {/* Signed in state */}
         <SignedIn>
-          <SignOutButton className = 'custom-login-btn'>
+          <SignOutButton>
             <input className='inputButton' type="button" value='Log out' style={{paddingTop:'2px', background: 'transparent', color:'black', border: "1px solid grey" }}/>
           </SignOutButton>
         </SignedIn>
         {/* align-items: center;
+        
   text-align: center; */}
 
       </div>

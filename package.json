@@ -5,6 +5,7 @@
   "dependencies": {
     "@clerk/backend": "^1.13.5",
     "@clerk/clerk-react": "^5.9.4",
+    "@clerk/types": "^4.26.0",
     "@cloudflare/kv-asset-handler": "^0.3.4",
     "@cloudinary/react": "^1.13.0",
     "@cloudinary/url-gen": "^1.21.0",
@@ -24,6 +25,8 @@
     "react-router-dom": "^6.26.2",
     "react-scripts": "^3.0.1",
     "reactjs-popup": "^2.0.6",
+    "styled": "^1.0.0",
+    "styled-components": "^6.1.13",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

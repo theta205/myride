@@ -27,13 +27,13 @@ if (isSignedIn && user.username == username){
                     borderRadius: '40%',   // Makes the toggle a circle
                     overflow: 'hidden',    // Ensures content fits within the circle
                     }}>
-                <Image
-                src= "/images/settingsIcon.png"
-                alt="setings-dropdown"
-                width={30}
-                height={30}
-                objectFit = 'cover'
-                />
+                    <img
+                    src="/images/settingsIcon.png"
+                    alt="settings-dropdown"
+                    objectFit="cover"
+                    style={{ width: '30px', height: '30px' }}
+                    />
+
               </Dropdown.Toggle>
               <Dropdown.Menu>
                 {!isSignedIn &&<Dropdown.Item href="/">SignUp/LogIn</Dropdown.Item>}

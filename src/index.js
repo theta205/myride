@@ -7,7 +7,6 @@ import reportWebVitals from './reportWebVitals';
 import { ClerkProvider } from '@clerk/clerk-react';
 
 const clerkPubKey = process.env.REACT_APP_CLERK_PUBLISHABLE_KEY;
-
 if (typeof document !== 'undefined') {
   const root = ReactDOM.createRoot(document.getElementById('root'));
   root.render(

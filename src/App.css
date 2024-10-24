@@ -22,7 +22,7 @@
 }
 
 .header-text {
-  font-size: 34px;
+  font-size: 45px;
   font-weight: bolder;
   padding-bottom: 35px;
 }
@@ -44,6 +44,7 @@
   flex-direction: column; /* Stack elements vertically */
   align-items: center; /* Center horizontally */
   justify-content: center; /* Center vertically */
+  width: auto;
 }
 
 /* Additional styles */
@@ -51,7 +52,14 @@
   margin-bottom: 10px; /* Space between text and button */
   font-size: 34px; /* Text styling */
 }
-
+.al-text {
+  margin-bottom: 10px; /* Space between text and button */
+  font-size: 34px; /* Text styling */
+}
+.reserve-text{
+  margin-bottom: 10px; /* Space between text and button */
+  font-size: 15px;
+}
 .inputButton {
   padding: 10px 20px;
   font-size: 16px;
@@ -63,14 +71,66 @@
 
 /* Ensure no fixed widths are restricting your layout */
 @media (max-width: 768px) {
-  .mainContainer, .titleContainer {
-    width: 50%; /* Set both to 50% width */
-    box-sizing: border-box; /* Include padding and border in width calculations */
+  /* .mainContainer, .titleContainer {
+    width: 50%;
+    box-sizing: border-box; 
+  } */
+  .header-text {
+    font-size: 30px;
   }
-
+  .share-text {
+    font-size: 25px; /* Space between text and button */
+    justify-content:  center;
+  }
+  .al-text {
+    font-size: 15px; /* Space between text and button */
+    justify-content:  center;
+  }
   .App2 {
     display: flex; /* Ensure the parent is flex */
     flex-wrap: wrap; /* Allow wrapping */
   }
 }
+@media (max-width: 500px) {
+  .mainContainer{
+    width: 100%;
+  }
+ .titleContainer{
+  width: 100%;
+  }
+  .header-text {
+    font-size: 20px;
+    padding-bottom: 15px;
+  }
+  .al-text {
+    font-size: 12px; /* Space between text and button */
+    justify-content:  center;
+  }
+  .share-text {
+    font-size: 20px; /* Space between text and button */
+    justify-content:  center;
+  }
+}
 
+
+.signup-overlay {
+  position: fixed; /* Fullscreen overlay */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+  backdrop-filter: blur(5px); /* Blur effect */
+  display: flex; /* Center contents */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  z-index: 1000; /* Make sure it is above other content */
+}
+
+.signup-container {
+  background: white; /* White background for the SignUp */
+  padding: 15px; /* Some padding */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+  width: 430px; /* Fixed width for the SignUp form */
+}

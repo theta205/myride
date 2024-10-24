@@ -15,7 +15,7 @@ import useFetchProfileData from './fetchProfileData';
 import 'dotenv/config';
 
 
-const UserCarEdit = () => {
+const UserCarEdit = ()  => {
   const { username } = useParams();
   const { user, isLoaded, isSignedIn } = useUser();
   const navigate = useNavigate();
@@ -27,16 +27,45 @@ const UserCarEdit = () => {
   const [error, setError] = useState('');
   const [re, needRe] = useState(false);
   const [tryedFetch, setTryedFetch] = useState(false);
-
-
   let key
+  
   useFetchProfileData( key, isSignedIn, tryedFetch, setTryedFetch, inputData, setData, setError, navigate)
-    console.log("data is ", inputData)
+
+  
+  console.log("data is ", inputData)
   useEffect(() => {
     if (inputData) {
       document.documentElement.style.setProperty('--mainColor', inputData.mainColor);
     }
   }, [inputData]);
+
+  const handleUpdate = async () => {
+    console.log("handleUpdate");
+    if (!inputData) {
+      console.error("Input data is null, cannot update.",inputData);
+      return;
+    }
+    try {
+      console.log("doinghandleUpdate", inputData);
+      const response = await fetch(`/api/setprofiles/${key}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(inputData),
+      });
+
+      if (!response.ok) {
+        console.log("ErrorhandleUpdate");
+        const errorMessage = await response.text();
+        setResponseMessage(`Error: ${errorMessage}`);
+      } else {
+        setResponseMessage('Data updated successfully!');
+      }
+    } catch (error) {
+      setResponseMessage(`Network error: ${error.message}`);
+    }
+  };
 
   useEffect(() => {
     if (re && inputData) {
@@ -192,37 +221,6 @@ const UserCarEdit = () => {
   //     console.error('Error during image upload:', error);
   //   }
   // };
-
-
-
-  const handleUpdate = async () => {
-    console.log("handleUpdate");
-    if (!inputData) {
-      console.error("Input data is null, cannot update.",inputData);
-      return;
-    }
-    try {
-      console.log("doinghandleUpdate", inputData);
-      const response = await fetch(`/api/setprofiles/${key}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(inputData),
-      });
-
-      if (!response.ok) {
-        console.log("ErrorhandleUpdate");
-        const errorMessage = await response.text();
-        setResponseMessage(`Error: ${errorMessage}`);
-      } else {
-        setResponseMessage('Data updated successfully!');
-      }
-    } catch (error) {
-      setResponseMessage(`Network error: ${error.message}`);
-    }
-  };
-
   const handleDataSubmit = (submittedData, headImage, file) => {
     console.log("1")
     setImage(headImage)
