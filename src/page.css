@@ -481,3 +481,18 @@
   cursor: pointer;
   border: 1px solid #ccc; /* Optional: border style */
 }
+.fade-button-edit {
+  font-size: 25px;
+  border: none;
+  font-family: 'Secular One', Georgia, 'Times New Roman', Times, serif;
+  border-radius: 15px;
+  background-color: white;
+  color: black;
+  cursor: pointer;
+  opacity: 0.9;  /* Start fully visible */
+  transition: opacity 1s ease-in-out;  /* Smooth transition for opacity */
+}
+
+.fade-button-edit.hidden {
+  opacity: 0.3;  /* When the button has the 'hidden' class, it becomes invisible */
+}

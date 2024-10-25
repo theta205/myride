@@ -18,6 +18,8 @@ const UserPage = () => {
   const [error, setError] = useState('');
   const [tryedFetch, setTryedFetch] = useState(false);
   const [isToggled, setIsToggled] = useState(false);
+  const [key, setKey] = useState(null);
+
   
   const def = {
     year: "1995",
@@ -34,9 +36,7 @@ const UserPage = () => {
   };
 
   const [inputData, setData] = useState(null);
-  const key = username;
-
-  useFetchProfileData( key, isSignedIn, tryedFetch, setTryedFetch, inputData, setData, setError, navigate)
+  useFetchProfileData( key, setKey,isSignedIn, tryedFetch, setTryedFetch, inputData, setData, setError, navigate, username)
 
   
   console.log("data is ", inputData)
@@ -58,16 +58,16 @@ const UserPage = () => {
       console.error('Error:', error);
     }
   };
-
-  useEffect(() => {
-    if (username) {
-      getImageDetails(username);
-    }
-  }, [username]);
-
-  if (!isLoaded) {
+  if (!isLoaded || !inputData) {
     return <div>Loading...</div>;
   }
+  if(isLoaded && !image && key){
+    getImageDetails(key);
+ }
+ if (!key){
+  setKey(username);
+ }
+
 
   const handleToggle = () => {
     setIsToggled(prevState => !prevState);

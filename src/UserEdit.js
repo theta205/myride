@@ -27,12 +27,21 @@ const UserCarEdit = ()  => {
   const [error, setError] = useState('');
   const [re, needRe] = useState(false);
   const [tryedFetch, setTryedFetch] = useState(false);
-  let key
-  
-  useFetchProfileData( key, isSignedIn, tryedFetch, setTryedFetch, inputData, setData, setError, navigate)
+  const [isVisible, setIsVisible] = useState(true);
+  const [key, setKey] = useState(null);
+  const [Open, setOpen] = useState(false);
 
+
+
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            setIsVisible((prev) => !prev); // Toggle visibility
+        }, 1000); // Change every 5 seconds
+
+        return () => clearInterval(intervalId); // Cleanup on component unmount
+    }, []);
   
-  console.log("data is ", inputData)
+  useFetchProfileData( key,setKey,isSignedIn, tryedFetch, setTryedFetch, inputData, setData, setError, navigate)  
   useEffect(() => {
     if (inputData) {
       document.documentElement.style.setProperty('--mainColor', inputData.mainColor);
@@ -75,70 +84,18 @@ const UserCarEdit = ()  => {
     }
   }, [re, handleUpdate,inputData]);
 
-  // useEffect(() => {
-  //   console.log("params", !inputData, isLoaded, tryedFetch);
-
-  //   // Check if we should set default data after trying to fetch
-  //   if (!inputData && isLoaded && tryedFetch) {
-  //       const setDefaultData = async () => {
-  //           const def = {
-  //               year: "1995",
-  //               make: "Mazda", 
-  //               model: "MX-5 Miata",
-  //               power: "0",
-  //               torque: "0",
-  //               drivetrain: "RWD",
-  //               hashtags: "#hashtag",
-  //               lightColor: "bisque",
-  //               mainColor: "lightsalmon",
-  //               darkColor: "darksalmon",
-  //               mods: []
-  //           };
-
-  //           // Set default data if no inputData is available after fetching
-  //           await setData(def);
-  //           console.log("Default data set", def);
-
-  //           // Trigger handleUpdate if needed after setting the default data
-  //           setTimeout(handleUpdate, 1000);
-  //       };
-
-  //       setDefaultData();
-  //   }
-
-// }, [inputData, isLoaded, tryedFetch, key, isSignedIn, setError, navigate]);
-
-
-
-
-  if (!isLoaded || !tryedFetch) {
-    return <div>Loading...</div>;
-  }
-  if (!isSignedIn) {
-    navigate('/');
-    return null;
-  }
-  if (user.username !== username) {
-    navigate(`/${user.username}/edit`);
-    return null;
-  }
-  if(isLoaded && isSignedIn){
-    key = user.username;
- }
-
-// Call the function to get the signature when you want to upload
-
-
-
-
+  useEffect(() => {
+    if (!key&& isSignedIn) {
+    setKey(user.username)
+    }
+  }, [isSignedIn, key]);
+ 
   const getImageDetails = async (public_id) => {
     try {
         const response = await fetch(`/api/photo/${public_id}`);
-    
         if (!response.ok) {
           throw new Error(`Error fetching image details: ${response.statusText}`);
         }
-    
         const data = await response.json();
         console.log('Fetched image details:', data);
         setImage(data.url) ;
@@ -147,9 +104,6 @@ const UserCarEdit = ()  => {
       }
   };
 
-  if(isLoaded && isSignedIn){
-    getImageDetails(user.username)
- }
 
  const apiKey = process.env.CLOUD_KEY
 
@@ -222,6 +176,7 @@ const UserCarEdit = ()  => {
   //   }
   // };
   const handleDataSubmit = (submittedData, headImage, file) => {
+    setOpen(false)
     console.log("1")
     setImage(headImage)
     setImageFile(file)
@@ -231,6 +186,7 @@ const UserCarEdit = ()  => {
     }));
     needRe(true);
     uploadImage(headImage)
+    console.log("Calling gid here2")
     getImageDetails(key)
    // uploadImage("/public/images/miata.png")
   };
@@ -279,6 +235,23 @@ const UserCarEdit = ()  => {
   const handleToggle = () => {
     setIsToggled((prevState) => !prevState);
   };
+
+  if (!isSignedIn) {
+    navigate('/');
+  }
+  if (!isLoaded || !tryedFetch || !inputData) {
+    return <div>Loading...</div>;
+  }
+  if (user.username !== username) {
+    navigate(`/${user.username}/edit`);
+  }
+  if(isLoaded && isSignedIn && !image && key){
+    getImageDetails(key);
+ }
+ if (!key){
+  setKey(user.username);
+ }
+
 
   const { year, make, model, power, torque, drivetrain, hashtags, lightColor, mainColor, darkColor, mods = [] } = inputData || {};
 
@@ -331,25 +304,25 @@ const UserCarEdit = ()  => {
               {inputData&&<PopupWithStatInput
                 trigger={
                   <button
-                    className="bubble-overlay"
+                    id='fadeButton'
+                    className={`fade-button-edit ${isVisible ? '' : 'hidden'}`}
                     style={{
-                      position: 'absolute',
-                      top: '15',
-                      left: '0',
-                      right: '0',
-                      bottom: '0',
-                      margin: 'auto',
+                      position: 'fixed',
+                      bottom: '0',   // Sticks the element to the top
+                      right: '0',   // Sticks the element to the top
+                      left: '0',   // Sticks the element to the top
                       width: '100%',
-                      height: '78%',
-                      background: 'transparent',
-                      border: 'transparent',
+                      height: '40px',
                       cursor: 'pointer',
-                      zIndex: 1,
-                      display: 'flex'
+                      zIndex: 1,  // Ensures the element stays on top of other content
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
                     }}
-                  ></button>
+                  >Click to Edit</button>
                 }
                 modal
+                open={true}
                 onSub={handleDataSubmit}
                 input={inputData}
                 imageFile={imagefile}

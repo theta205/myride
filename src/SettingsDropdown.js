@@ -9,7 +9,7 @@ import { useParams, useLocation } from 'react-router-dom';
 
 function SettingsDropdown() {
     const location = useLocation();
-    const isEditPage = location.pathname.endsWith('/edit');
+    const isEditPage = location.pathname.endsWith('/edit') ||location.pathname.endsWith('/first') ;
     const {username} = useParams();
   const { user, isLoaded, isSignedIn } = useUser();
 let owner;
@@ -33,7 +33,6 @@ if (isSignedIn && user.username == username){
                     objectFit="cover"
                     style={{ width: '30px', height: '30px' }}
                     />
-
               </Dropdown.Toggle>
               <Dropdown.Menu>
                 {!isSignedIn &&<Dropdown.Item href="/">SignUp/LogIn</Dropdown.Item>}

@@ -70,7 +70,7 @@ const Home = () => {
 
   const handleSignUpSuccess = () => {
     // Navigate to profile or another route after successful sign-up
-    navigate("/" + usernameS);
+    navigate("/" + user.username + "/edit/first");
   };
 
   const handleSignInSuccess = () => {

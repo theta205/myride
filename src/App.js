@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes, useParams, Navigate } from 'react-router-
 import Home from './home';
 import UserPage from './UserPage'; // Import your UserPage component
 import UserEdit from './UserEdit.js'; // Import your UserPage component
+import First from './first';
 import NotFound from './NotFound'; // Create a 404 Not Found component
 import './App.css';
 import { useUser } from '@clerk/clerk-react';
@@ -39,7 +40,11 @@ function App() {
           {/* <Route path="/api/profiles/:key" element={<Store />}> </Route> */}
           <Route 
             path="/:username/edit" // Dynamic route for usernames
-            element={<UserEdit />} // Add the route for UserPage
+            element={<UserEdit/>} // Add the route for UserPage
+          />
+          <Route 
+            path="/:username/edit/first" // Dynamic route for usernames
+            element={<First/>} // Add the route for UserPage
           />
           {/* You can also add other routes here */}
         </Routes>

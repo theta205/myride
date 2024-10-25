@@ -40,12 +40,11 @@ function UserRoute() {
 
   // Find the specific user object that matches userParam
   const user = users.find(user => user.username === username);
-
+  console.log(users)
   if (user) {
     // If the user exists, render their information
     console.log("sending to user")
     return (
-      
       <UserPage></UserPage>
     );
   } else {

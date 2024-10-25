@@ -18,9 +18,10 @@ import 'react-image-crop/dist/ReactCrop.css';
 import { makeAspectCrop } from 'react-image-crop';
 import { heic } from '@cloudinary/url-gen/qualifiers/format';
 
-const PopupWithStatInput = ({ trigger, onSub, input, imageFile }) => {
+const PopupWithStatInput = ({ trigger, onSub, input, imageFile, open }) => {
    // console.log(imageFile)
     const [inputData, setInputData] = useState(input);
+    
     const hashtags = [
         '#Manual',
         '#Bagged',
@@ -113,8 +114,9 @@ const PopupWithStatInput = ({ trigger, onSub, input, imageFile }) => {
         });
     };
 
+
+      
     const handleSubmit = (e) => {
-        e.preventDefault();
         const submittedData = {
             ...inputData,
             model: inputData.model === 'Other' ? inputData.customModel : inputData.model,
@@ -130,7 +132,7 @@ const PopupWithStatInput = ({ trigger, onSub, input, imageFile }) => {
             console.log("just subbed " ,croppedImage)
 
         }
-    };
+   };
 
     const fetchYears = async () => {
         try {
@@ -494,11 +496,16 @@ const  cropImage = (crop) => {
             
         
     }
+    // Function to simulate Escape key press
+// Wait for the DOM to be fully loaded
+
+
+    
   return (
 
     <div style={{ height: "auto", display: 'flex', justifyContent: 'center'}}>
-            <Popup trigger={trigger} className="popup-content" position="bottom center"  closeOnEscape closeOnDocumentClick>
-<form onSubmit={handleSubmit} style={{ justifyContent: 'center',height: "auto" , display: 'flex', backgroundColor: 'white'}}>
+          <Popup trigger={trigger} className="popup-content" position="top center"  closeOnEscape closeOnDocumentClick>
+                {close => ( <div>  < form onSubmit={handleSubmit} action="#" style={{ justifyContent: 'center',height: "auto" , display: 'flex', backgroundColor: 'white'}}>
                     <Col >
                     <Row style={{ marginLeft: '1px', display: 'flex', justifyContent: 'center', width: '100%' }}>
                     <p style={{ fontSize: '2em', fontFamily: 'Secular One, sans-serif',fontWeight: 'light' ,textAlign:'center'}}>Enter Your Car's Info</p>
@@ -933,19 +940,36 @@ const  cropImage = (crop) => {
             </Col>
             </Row>
             </div>
-            <Row style={{justifyContent: 'center'}}>
+                 {/* <Row style={{justifyContent: 'center'}}>
                 <button 
+                    id="simulateEscapeBtn"
                     type="submit" 
                     className="popup-content-button" 
                     style={{width: '90%'}}
                  >
                  Submit
                 </button>
-                </Row> 
+                </Row>  */}
                 </Col>
 
-          </form>
-      </Popup>
+          </form> 
+          <Row style={{justifyContent: 'center'}}>
+                <button 
+                    type="button" 
+                    className="popup-content-button" 
+                    style={{width: '90%'}}
+                    onClick={() => {
+                        handleSubmit();
+                        close();
+                    }}
+                 >
+                 Submit
+                </button>
+            </Row> 
+           </div>
+          )}
+        </Popup>
+        
     </div>
   );
 };
